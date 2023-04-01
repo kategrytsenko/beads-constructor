@@ -3,10 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { PaintBlockComponent } from './paint-block/paint-block.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    PaintBlockComponent
   ],
   imports: [
     BrowserModule,
