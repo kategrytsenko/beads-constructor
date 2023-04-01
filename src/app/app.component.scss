@@ -40,9 +40,20 @@
 .color-picker-container {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .beads-raw {
   display: flex;
   justify-content: center;
+}
+
+.saved-color-container {
+  display: flex;
+}
+
+.saved-color {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid #ccc;
 }

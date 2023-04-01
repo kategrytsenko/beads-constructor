@@ -25,12 +25,22 @@
     </div>
 
     <div class="color-picker-controls-container col-3">
+      <div class="saved-colors">
+        <div *ngFor="let color of savedColors">
+          <div class="saved-color-container">
+            <div class="saved-color" [style.background-color]="color"></div>
+            <button (click)="selectColor(color)" class="btn btn-light">Select</button>
+            <button (click)="deleteColor(color)" class="btn btn-light">Delete</button>
+          </div>
+        </div>
+      </div>
       <div class="color-picker-container">
-        <div class="control-title">Select color:</div>
+        <div class="control-title">Selected color:</div>
         <div><input type="color" [(ngModel)]="selectedColor"></div>
+        <button (click)="saveColor()" class="btn btn-light">Save</button>
       </div>
       <div>
-        <button (click)="setWhite()" class="btn btn-primary">Set white color</button>
+        <button (click)="setWhite()" class="btn btn-primary">Set white</button>
       </div>
     </div>
   </div>
@@ -42,11 +52,5 @@
 </div>
 
 
-<router-outlet></router-outlet>
-
-
-<!--TODO:
-- додати можливість збереження - поки в локал стореджі
-- додати можливість засетати вибрані кольори, щоб ними малювати
-- трішки логічніше порозміщувати елементи на сторінці - кнопки по блоках якось розмістити з відповідними їм імпутами
--->
+<!--TODO:-->
+<!--possibility to save the design-->

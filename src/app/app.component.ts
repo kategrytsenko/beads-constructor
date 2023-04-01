@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+
 import { PaintBlockModel } from './paint-block/paint-block.model';
 import { generateCanvasArray, getArrayWithSettedLength } from './utils';
 
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit {
   selectedColor = '#ffffff';
 
   canvasArray: PaintBlockModel[][] = [];
+  savedColors: string[] = JSON.parse(localStorage.getItem('savedColors') || '[]');
 
   ngOnInit() {
     const canvasArray = JSON.parse(localStorage.getItem('canvasArray') || '[]');
@@ -35,6 +37,25 @@ export class AppComponent implements OnInit {
 
   setWhite() {
     this.selectedColor = '#ffffff';
+  }
+
+  saveColor() {
+    if(this.savedColors.indexOf(this.selectedColor) === -1) {
+      this.savedColors.push(this.selectedColor);
+      localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
+    };
+  }
+
+  deleteColor(color: string) {
+    const colorIndex = this.savedColors.indexOf(color);
+    if(colorIndex !== -1) {
+      this.savedColors.splice(colorIndex, 1);
+      localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
+    };
+  }
+
+  selectColor(color: string) {
+    this.selectedColor = color;
   }
 
   updateArray(updatedObjects: PaintBlockModel[][]) {
