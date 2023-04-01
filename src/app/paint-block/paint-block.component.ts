@@ -1,4 +1,11 @@
-import { Component, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  Input,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { PaintBlockModel } from './paint-block.model';
 
 @Component({
@@ -15,7 +22,6 @@ export class PaintBlockComponent {
   @Input() selectedColor!: string;
 
   @Input() paintBlockData!: PaintBlockModel;
-
 
   changeCanvasColor() {
     this.colorChanged.emit(this.paintBlockData);

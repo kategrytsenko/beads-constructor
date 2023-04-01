@@ -11,8 +11,12 @@ export class AppComponent implements OnInit {
   defaultrawBeadsAmount = 11;
   defaultColumnBeadsAmount = 5;
 
-  rawBeadsAmount: number = Number(localStorage.getItem('rawBeadsAmount')) || this.defaultrawBeadsAmount;
-  columnBeadsAmount: number = Number(localStorage.getItem('columnBeadsAmount')) || this.defaultColumnBeadsAmount;
+  rawBeadsAmount: number =
+    Number(localStorage.getItem('rawBeadsAmount')) ||
+    this.defaultrawBeadsAmount;
+  columnBeadsAmount: number =
+    Number(localStorage.getItem('columnBeadsAmount')) ||
+    this.defaultColumnBeadsAmount;
 
   beadsRawArray: number[] = getArrayWithSettedLength(this.rawBeadsAmount);
   beadsColumnArray: number[] = getArrayWithSettedLength(this.columnBeadsAmount);
@@ -24,7 +28,9 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     const canvasArray = JSON.parse(localStorage.getItem('canvasArray') || '[]');
 
-    this.canvasArray = !canvasArray.length ? generateCanvasArray(this.rawBeadsAmount, this.columnBeadsAmount) : canvasArray;
+    this.canvasArray = !canvasArray.length
+      ? generateCanvasArray(this.rawBeadsAmount, this.columnBeadsAmount)
+      : canvasArray;
   }
 
   setWhite() {
@@ -38,8 +44,8 @@ export class AppComponent implements OnInit {
   }
 
   clearAllCanvas() {
-    const updatedObjects = this.canvasArray.map(row => {
-      return row.map(object => {
+    const updatedObjects = this.canvasArray.map((row) => {
+      return row.map((object) => {
         object.color = '#ffffff';
 
         return object;
@@ -54,18 +60,24 @@ export class AppComponent implements OnInit {
     this.beadsColumnArray = getArrayWithSettedLength(this.columnBeadsAmount);
 
     localStorage.setItem('rawBeadsAmount', this.rawBeadsAmount.toString());
-    localStorage.setItem('columnBeadsAmount', this.columnBeadsAmount.toString());
+    localStorage.setItem(
+      'columnBeadsAmount',
+      this.columnBeadsAmount.toString()
+    );
 
     this.clearAllCanvas();
-    this.canvasArray = generateCanvasArray(this.rawBeadsAmount, this.columnBeadsAmount);
+    this.canvasArray = generateCanvasArray(
+      this.rawBeadsAmount,
+      this.columnBeadsAmount
+    );
     localStorage.setItem('canvasArray', JSON.stringify(this.canvasArray));
   }
 
   onColorChanged(paintedBlock: PaintBlockModel) {
-    const updatedObject = {id: paintedBlock.id, color: this.selectedColor};
+    const updatedObject = { id: paintedBlock.id, color: this.selectedColor };
 
-    const updatedObjects = this.canvasArray.map(row => {
-      return row.map(object => {
+    const updatedObjects = this.canvasArray.map((row) => {
+      return row.map((object) => {
         return object.id === updatedObject.id ? updatedObject : object;
       });
     });

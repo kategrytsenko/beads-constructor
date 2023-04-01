@@ -1,19 +1,48 @@
-.beads-raw {
+.main-container {
+  margin: 15px;
+}
+
+.beads-canvas__container {
   display: flex;
   flex-direction: row;
-  margin: 10px auto;
+  justify-content: center;
+  align-items: center;
 }
 
-.beads-item {
-  margin: 10px;
+.controls-container {
+  display: flex;
+  padding: 15px;
+  &__input {
+    width: 50px;
+  }
 }
 
-.dimensions-container {
+.dimensions__controls {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  &-column {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+}
+
+.control-title {
+  margin-right: 10px;
+}
+
+.color-picker-controls-container {
   display: flex;
   flex-direction: column;
 }
 
-.colors-container {
+.color-picker-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+}
+
+.beads-raw {
+  display: flex;
+  justify-content: center;
 }

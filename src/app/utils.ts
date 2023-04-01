@@ -4,7 +4,10 @@ export const getArrayWithSettedLength = (length: number): number[] => {
   return Array.from({ length }, (_, i) => i);
 };
 
-export const generateCanvasArray = (rawAmount: number, columnAmount: number): PaintBlockModel[][] => {
+export const generateCanvasArray = (
+  rawAmount: number,
+  columnAmount: number
+): PaintBlockModel[][] => {
   const canvasArray = [];
 
   for (let i = 0; i < rawAmount; i++) {
@@ -18,4 +21,4 @@ export const generateCanvasArray = (rawAmount: number, columnAmount: number): Pa
   }
 
   return canvasArray;
-}
+};
