@@ -25,7 +25,9 @@ export class AppComponent implements OnInit {
   selectedColor = '#ffffff';
 
   canvasArray: PaintBlockModel[][] = [];
-  savedColors: string[] = JSON.parse(localStorage.getItem('savedColors') || '[]');
+  savedColors: string[] = JSON.parse(
+    localStorage.getItem('savedColors') || '[]'
+  );
 
   ngOnInit() {
     const canvasArray = JSON.parse(localStorage.getItem('canvasArray') || '[]');
@@ -40,18 +42,18 @@ export class AppComponent implements OnInit {
   }
 
   saveColor() {
-    if(this.savedColors.indexOf(this.selectedColor) === -1) {
+    if (this.savedColors.indexOf(this.selectedColor) === -1) {
       this.savedColors.push(this.selectedColor);
       localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
-    };
+    }
   }
 
   deleteColor(color: string) {
     const colorIndex = this.savedColors.indexOf(color);
-    if(colorIndex !== -1) {
+    if (colorIndex !== -1) {
       this.savedColors.splice(colorIndex, 1);
       localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
-    };
+    }
   }
 
   selectColor(color: string) {
