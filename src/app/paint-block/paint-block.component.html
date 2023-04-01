@@ -1,4 +1,3 @@
-<canvas #canvas></canvas>
-<input type="color" [(ngModel)]="color">
-<button (click)="pourPaint()">Pour Paint</button>
-
+<canvas id="myCanvas" width="200" height="200"
+        (click)="changeCanvasColor()" [style.background-color]="paintBlockData.color">
+</canvas>

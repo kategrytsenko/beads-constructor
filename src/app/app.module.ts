@@ -1,20 +1,15 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { PaintBlockComponent } from './paint-block/paint-block.component';
+import { PaintBlockModule } from './paint-block/paint-block.module';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common'; // import FormsModule
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    PaintBlockComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
+  declarations: [AppComponent],
+  imports: [AppRoutingModule, PaintBlockModule, FormsModule, CommonModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

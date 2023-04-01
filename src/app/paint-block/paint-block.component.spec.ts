@@ -8,9 +8,8 @@ describe('PaintBlockComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PaintBlockComponent ]
-    })
-    .compileComponents();
+      declarations: [PaintBlockComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
