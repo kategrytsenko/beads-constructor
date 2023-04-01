@@ -1,28 +1,33 @@
-<div class="dimensions-container">
-  <div class="dimensions__controls">
-    <div><input type="number" [(ngModel)]="rawBeadsAmount" max="100"></div>
-    <div><input type="number" [(ngModel)]="columnBeadsAmount" max="100"></div>
-    <button (click)="setNewDimensions()">Change the canvas size</button>
+<div class="container">
+  <div class="row">
+    <div class="dimensions-container col-3 col-lg-3">
+      <div class="dimensions__controls">
+        <div><input type="number" [(ngModel)]="rawBeadsAmount" max="100"></div>
+        <div><input type="number" [(ngModel)]="columnBeadsAmount" max="100"></div>
+        <button (click)="setNewDimensions()">Change the canvas size</button>
+      </div>
+
+      <div>Number of beads in the raw: {{ rawBeadsAmount }}</div>
+      <div>Number of beads in the column: {{ columnBeadsAmount }}</div>
+    </div>
+
+    <div class="colors-container col-3">
+      <button (click)="setWhite()">Set white color</button>
+      <button (click)="clearAllCanvas()">Clear all canvas</button>
+
+      <input type="color" [(ngModel)]="selectedColor">
+    </div>
+
   </div>
 
-  <div>Number of beads in the raw: {{ rawBeadsAmount }}</div>
-  <div>Number of beads in the column: {{ columnBeadsAmount }}</div>
-</div>
-
-<div class="colors-container">
-  <button (click)="setWhite()">Set white color</button>
-  <button (click)="clearAllCanvas()">Clear all canvas</button>
-
-  <input type="color" [(ngModel)]="selectedColor">
-</div>
-
-<div class="beads-raw" *ngFor="let i of beadsColumnArray">
-  <app-paint-block *ngFor="let j of beadsRawArray"
-                   [selectedColor]="selectedColor"
-                   [paintBlockData]="canvasArray[j][i]"
-                   (colorChanged)="onColorChanged($event)"
-                   class="beads-item">
-  </app-paint-block>
+  <div class="beads-raw" *ngFor="let i of beadsColumnArray">
+    <app-paint-block *ngFor="let j of beadsRawArray"
+                     [selectedColor]="selectedColor"
+                     [paintBlockData]="canvasArray[j][i]"
+                     (colorChanged)="onColorChanged($event)"
+                     class="beads-item">
+    </app-paint-block>
+  </div>
 </div>
 
 
