@@ -1,0 +1,50 @@
+.constructor-page-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.constructor-painting-panel {
+  position: sticky;
+  top: 64px;
+  height: 100vh;
+  width: 150px;
+  app-painting-panel {
+    position: relative;
+  }
+}
+
+.constructor-main-container {
+  padding: 15px;
+}
+
+.beads-canvas__container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.controls-container {
+  display: flex;
+  padding: 15px;
+  &__input {
+    width: 50px;
+  }
+}
+
+.dimensions__controls {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  &-column {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+}
+
+.beads-raw {
+  display: flex;
+  justify-content: center;
+}

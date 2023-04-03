@@ -1,0 +1,33 @@
+.color-picker-controls-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.color-picker-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 15px;
+}
+
+.saved-color-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saved-colors {
+  padding: 15px;
+}
+
+.saved-color {
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid #ccc;
+}
+
+.mat-mdc-icon-button.mat-mdc-button-base {
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+}

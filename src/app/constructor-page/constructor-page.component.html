@@ -1,0 +1,64 @@
+<div class="constructor-page-container">
+  <div class="constructor-painting-panel">
+    <app-painting-panel
+      [savedColors]="savedColors"
+      (onSelectSavedColor)="selectColor($event)"
+      (onColorDelete)="deleteColor($event)"
+      (onSaveColor)="saveColor()"
+      (onSetWhite)="setWhite()"
+      [selectedColor]="selectedColor"
+      (colorChanged)="selectedColor = $event"
+    ></app-painting-panel>
+  </div>
+
+  <div class="constructor-main-container">
+    <div class="dimensions__controls">
+      <div class="dimensions__controls-column">
+        <div class="control-title">Number of beads in the raw:</div>
+        <div>
+          <input
+            type="number"
+            class="controls-container__input"
+            [(ngModel)]="rawBeadsAmount"
+            max="100"
+          />
+        </div>
+      </div>
+      <div class="dimensions__controls-column">
+        <div class="control-title">Number of beads in the column:</div>
+        <div>
+          <input
+            type="number"
+            class="controls-container__input"
+            [(ngModel)]="columnBeadsAmount"
+            max="100"
+          />
+        </div>
+      </div>
+      <button (click)="setNewDimensions()" class="btn btn-primary">
+        Change the canvas size
+      </button>
+    </div>
+
+    <div class="row beads-canvas__container">
+      <div class="col-9">
+        <app-beads-constructor
+          [selectedColor]="selectedColor"
+          [beadsColumnArray]="beadsColumnArray"
+          [beadsRawArray]="beadsRawArray"
+          [canvasArray]="canvasArray"
+          (colorChanged)="onColorChanged($event)"
+        ></app-beads-constructor>
+      </div>
+    </div>
+
+    <div>
+      <button (click)="clearAllCanvas()" class="btn btn-primary">
+        Clear all canvas
+      </button>
+    </div>
+  </div>
+</div>
+
+<!--TODO:-->
+<!--possibility to save the design-->
