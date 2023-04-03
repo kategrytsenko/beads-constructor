@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BeadsConstructorModule } from '../beads-constructor/beads-constructor.module';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [ConstructorPageComponent],
@@ -17,6 +18,8 @@ import { BeadsConstructorModule } from '../beads-constructor/beads-constructor.m
     CommonModule,
     NgbModule,
     BrowserAnimationsModule,
+
+    MatButtonModule
   ],
   providers: [],
 })

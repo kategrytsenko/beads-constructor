@@ -1,13 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
 import { PaintBlockModel } from '../beads-constructor/paint-block.model';
+import { AuthService } from '../auth/auth.service';
+import { Subscription } from 'rxjs';
+import { MotivateLoginPopupComponent } from '../motivate-login-popup/motivate-login-popup.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-constructor-page',
   templateUrl: './constructor-page.component.html',
   styleUrls: ['./constructor-page.component.scss'],
 })
-export class ConstructorPageComponent {
+export class ConstructorPageComponent implements OnInit, OnDestroy {
+  authSubscription!: Subscription;
+  isAuth = false;
+
   defaultrawBeadsAmount = 11;
   defaultColumnBeadsAmount = 5;
 
@@ -28,7 +35,15 @@ export class ConstructorPageComponent {
     localStorage.getItem('savedColors') || '[]'
   );
 
+  constructor (private authService: AuthService, private dialog: MatDialog) {}
+
   ngOnInit() {
+    this.authSubscription = this.authService.authChange$$.subscribe(
+      (authStatus: boolean) => {
+        this.isAuth = authStatus;
+      }
+    );
+
     const canvasArray = JSON.parse(localStorage.getItem('canvasArray') || '[]');
 
     this.canvasArray = !canvasArray.length
@@ -105,5 +120,18 @@ export class ConstructorPageComponent {
     });
 
     this.updateArray(updatedObjects);
+  }
+
+  onDesignSave() {
+    if(!this.isAuth) {
+      this.dialog.open(MotivateLoginPopupComponent);
+    } else {
+      // TODO: implement
+      console.log('Saving...')
+    }
+  }
+
+  ngOnDestroy() {
+    this.authSubscription.unsubscribe();
   }
 }

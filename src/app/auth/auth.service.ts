@@ -2,11 +2,16 @@ import { User } from './user.model';
 import { AuthData } from './auth-data.model';
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { Router } from '@angular/router';
 
-// @Injectable()
+@Injectable()
 export class AuthService {
   authChange$$ = new Subject<boolean>();
   private user!: User | null;
+
+  constructor (private router: Router) {
+
+  }
 
   registerUser(authData: AuthData) {
     this.user = {
