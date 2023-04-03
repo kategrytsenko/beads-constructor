@@ -6,7 +6,6 @@ import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SignupModule } from './auth/signup/signup.module';
 import { LoginModule } from './auth/login/login.module';
-import { WelcomePageModule } from './welcome-page/welcome-page.module';
 import { BeadsConstructorModule } from './beads-constructor/beads-constructor.module';
 import { PaintingPanelModule } from './painting-panel/painting-panel.module';
 import { SavedDesignsPageModule } from './saved-designs-page/saved-designs-page.module';
@@ -26,7 +25,6 @@ import { HeaderModule } from './header/header.module';
 
     SignupModule,
     LoginModule,
-    WelcomePageModule,
     BeadsConstructorModule,
     PaintingPanelModule,
     SavedDesignsPageModule,
