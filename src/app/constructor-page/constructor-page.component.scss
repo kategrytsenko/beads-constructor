@@ -1,11 +1,27 @@
-.main-container {
-  margin: 15px;
+.constructor-page-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.constructor-painting-panel {
+  position: sticky;
+  top: 64px;
+  height: 100vh;
+  width: 150px;
+  app-painting-panel {
+    position: relative;
+  }
+}
+
+.constructor-main-container {
+  padding: 15px;
 }
 
 .beads-canvas__container {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -28,32 +44,7 @@
   }
 }
 
-.control-title {
-  margin-right: 10px;
-}
-
-.color-picker-controls-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.color-picker-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
 .beads-raw {
   display: flex;
   justify-content: center;
-}
-
-.saved-color-container {
-  display: flex;
-}
-
-.saved-color {
-  width: 2.4rem;
-  height: 2.4rem;
-  border: 1px solid #ccc;
 }
