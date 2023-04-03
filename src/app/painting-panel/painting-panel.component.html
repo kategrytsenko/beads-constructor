@@ -3,10 +3,18 @@
     <div *ngFor="let color of savedColors">
       <div class="saved-color-container">
         <div class="saved-color" [style.background-color]="color"></div>
-        <button (click)="onSelectSavedColor.emit(color)" mat-icon-button color="primary">
+        <button
+          (click)="onSelectSavedColor.emit(color)"
+          mat-icon-button
+          color="primary"
+        >
           <mat-icon>done</mat-icon>
         </button>
-        <button (click)="onColorDelete.emit(color)" mat-icon-button color="accent">
+        <button
+          (click)="onColorDelete.emit(color)"
+          mat-icon-button
+          color="accent"
+        >
           <mat-icon>delete</mat-icon>
         </button>
       </div>
@@ -14,11 +22,19 @@
   </div>
   <div class="color-picker-container">
     <div class="control-title">Selected color:</div>
-    <div><input type="color" [(ngModel)]="selectedColor" (change)="onColorChange(selectedColor)"/></div>
+    <div>
+      <input
+        type="color"
+        [(ngModel)]="selectedColor"
+        (change)="onColorChange(selectedColor)"
+      />
+    </div>
     <button (click)="onSaveColor.emit()" mat-icon-button color="primary">
       <mat-icon aria-label="save">bookmarks</mat-icon>
     </button>
 
-    <button (click)="onSetWhite.emit()" mat-button color="primary">Clear</button>
+    <button (click)="onSetWhite.emit()" mat-button color="primary">
+      Clear
+    </button>
   </div>
 </div>

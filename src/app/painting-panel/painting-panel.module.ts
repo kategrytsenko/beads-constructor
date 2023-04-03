@@ -7,12 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [PaintingPanelComponent],
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatIconModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
   exports: [PaintingPanelComponent],
 })
 export class PaintingPanelModule {}
