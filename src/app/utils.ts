@@ -1,4 +1,4 @@
-import { PaintBlockModel } from './paint-block/paint-block.model';
+import { PaintBlockModel } from './beads-constructor/paint-block.model';
 
 export const getArrayWithSettedLength = (length: number): number[] => {
   return Array.from({ length }, (_, i) => i);

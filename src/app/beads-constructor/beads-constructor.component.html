@@ -1,0 +1,10 @@
+<div class="beads-raw" *ngFor="let i of beadsColumnArray">
+  <canvas
+    *ngFor="let j of beadsRawArray"
+    class="beads-item"
+    width="200"
+    height="200"
+    (click)="changeCanvasColor(canvasArray[j][i])"
+    [style.background-color]="canvasArray[j][i].color"
+  ></canvas>
+</div>

@@ -1,0 +1,81 @@
+<div class="constructor-page-container">
+  <div class="constructor-painting-panel">
+    <app-painting-panel></app-painting-panel>
+  </div>
+  <div class="constructor-main-container"></div>
+</div>
+
+<div class="main-container">
+  <div class="dimensions__controls">
+    <div class="dimensions__controls-column">
+      <div class="control-title">Number of beads in the raw:</div>
+      <div>
+        <input
+          type="number"
+          class="controls-container__input"
+          [(ngModel)]="rawBeadsAmount"
+          max="100"
+        />
+      </div>
+    </div>
+    <div class="dimensions__controls-column">
+      <div class="control-title">Number of beads in the column:</div>
+      <div>
+        <input
+          type="number"
+          class="controls-container__input"
+          [(ngModel)]="columnBeadsAmount"
+          max="100"
+        />
+      </div>
+    </div>
+    <button (click)="setNewDimensions()" class="btn btn-primary">
+      Change the canvas size
+    </button>
+  </div>
+
+  <div class="row beads-canvas__container">
+    <div class="col-9">
+      <app-beads-constructor
+        [selectedColor]="selectedColor"
+        [beadsColumnArray]="beadsColumnArray"
+        [beadsRawArray]="beadsRawArray"
+        [canvasArray]="canvasArray"
+        (colorChanged)="onColorChanged($event)"
+      ></app-beads-constructor>
+    </div>
+
+    <div class="color-picker-controls-container col-3">
+      <div class="saved-colors">
+        <div *ngFor="let color of savedColors">
+          <div class="saved-color-container">
+            <div class="saved-color" [style.background-color]="color"></div>
+            <button (click)="selectColor(color)" class="btn btn-light">
+              Select
+            </button>
+            <button (click)="deleteColor(color)" class="btn btn-light">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="color-picker-container">
+        <div class="control-title">Selected color:</div>
+        <div><input type="color" [(ngModel)]="selectedColor" /></div>
+        <button (click)="saveColor()" class="btn btn-light">Save</button>
+      </div>
+      <div>
+        <button (click)="setWhite()" class="btn btn-primary">Set white</button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <button (click)="clearAllCanvas()" class="btn btn-primary">
+      Clear all canvas
+    </button>
+  </div>
+</div>
+
+<!--TODO:-->
+<!--possibility to save the design-->

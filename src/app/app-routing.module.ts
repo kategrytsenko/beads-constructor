@@ -7,26 +7,26 @@ import { SavedDesignsPageComponent } from './saved-designs-page/saved-designs-pa
 import { LoginComponent } from './auth/login/login.component';
 
 const routes: Routes = [
+  // {
+  //   path: '',
+  //   component: WelcomePageComponent,
+  // },
   {
     path: '',
-    component: WelcomePageComponent
+    component: ConstructorPageComponent,
   },
   {
     path: 'signup',
-    component: SignupComponent
+    component: SignupComponent,
   },
   {
     path: 'login',
-    component: LoginComponent
-  },
-  {
-    path: 'constructor',
-    component: ConstructorPageComponent
+    component: LoginComponent,
   },
   {
     path: 'designs',
-    component: SavedDesignsPageComponent
-  }
+    component: SavedDesignsPageComponent,
+  },
 ];
 
 @NgModule({
