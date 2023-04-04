@@ -1,11 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
-import { PaintBlockModel } from '../beads-constructor/paint-block.model';
-import { AuthService } from '../auth/auth.service';
+import {
+  ConstructorConfig,
+  PaintBlockModel,
+} from '../models/constructor-models';
+import { AuthService } from '../core/auth/auth.service';
 import { Subscription } from 'rxjs';
-import { MotivateLoginPopupComponent } from '../motivate-login-popup/motivate-login-popup.component';
+import { MotivateLoginPopupComponent } from './components/motivate-login-popup/motivate-login-popup.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ConstructorService } from '../services/constructor.service';
+import { ColorsService } from '../services/colors.service';
 
 @Component({
   selector: 'app-constructor-page',
@@ -16,30 +20,20 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   authSubscription!: Subscription;
   isAuth = false;
 
-  defaultrawBeadsAmount = 11;
-  defaultColumnBeadsAmount = 5;
+  constructorConfig!: ConstructorConfig;
 
-  rawBeadsAmount: number =
-    Number(localStorage.getItem('rawBeadsAmount')) ||
-    this.defaultrawBeadsAmount;
-  columnBeadsAmount: number =
-    Number(localStorage.getItem('columnBeadsAmount')) ||
-    this.defaultColumnBeadsAmount;
-
-  beadsRawArray: number[] = getArrayWithSettedLength(this.rawBeadsAmount);
-  beadsColumnArray: number[] = getArrayWithSettedLength(this.columnBeadsAmount);
+  rawBeadsAmount: number = this.constructorService.rawBeadsAmount;
+  columnBeadsAmount: number = this.constructorService.columnBeadsAmount;
 
   selectedColor = '#ffffff';
-
-  canvasArray: PaintBlockModel[][] = [];
-  savedColors: string[] = JSON.parse(
-    localStorage.getItem('savedColors') || '[]'
-  );
+  savedColors: string[] = this.colorsService.getColors();
 
   constructor(
     private authService: AuthService,
     private dialog: MatDialog,
-    private roter: Router
+    private router: Router,
+    private constructorService: ConstructorService,
+    private colorsService: ColorsService
   ) {}
 
   ngOnInit() {
@@ -49,11 +43,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       }
     );
 
-    const canvasArray = JSON.parse(localStorage.getItem('canvasArray') || '[]');
-
-    this.canvasArray = !canvasArray.length
-      ? generateCanvasArray(this.rawBeadsAmount, this.columnBeadsAmount)
-      : canvasArray;
+    this.constructorConfig = this.constructorService.getConstructorConfig();
   }
 
   setWhite() {
@@ -61,70 +51,36 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   saveColor() {
-    if (this.savedColors.indexOf(this.selectedColor) === -1) {
-      this.savedColors.push(this.selectedColor);
-      localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
-    }
+    this.savedColors = this.colorsService.saveColor(this.selectedColor);
   }
 
   deleteColor(color: string) {
-    const colorIndex = this.savedColors.indexOf(color);
-    if (colorIndex !== -1) {
-      this.savedColors.splice(colorIndex, 1);
-      localStorage.setItem('savedColors', JSON.stringify(this.savedColors));
-    }
+    this.savedColors = this.colorsService.deleteColor(color);
   }
 
   selectColor(color: string) {
     this.selectedColor = color;
   }
 
-  updateArray(updatedObjects: PaintBlockModel[][]) {
-    this.canvasArray = updatedObjects;
-
-    localStorage.setItem('canvasArray', JSON.stringify(this.canvasArray));
-  }
-
   clearAllCanvas() {
-    const updatedObjects = this.canvasArray.map((row) => {
-      return row.map((object) => {
-        object.color = '#ffffff';
-
-        return object;
-      });
-    });
-
-    this.updateArray(updatedObjects);
+    this.constructorConfig.canvasArray =
+      this.constructorService.clearAllCanvas();
   }
 
   setNewDimensions() {
-    this.beadsRawArray = getArrayWithSettedLength(this.rawBeadsAmount);
-    this.beadsColumnArray = getArrayWithSettedLength(this.columnBeadsAmount);
-
-    localStorage.setItem('rawBeadsAmount', this.rawBeadsAmount.toString());
-    localStorage.setItem(
-      'columnBeadsAmount',
-      this.columnBeadsAmount.toString()
-    );
-
     this.clearAllCanvas();
-    this.canvasArray = generateCanvasArray(
+
+    this.constructorConfig = this.constructorService.resetConstructorConfig(
       this.rawBeadsAmount,
       this.columnBeadsAmount
     );
-    localStorage.setItem('canvasArray', JSON.stringify(this.canvasArray));
   }
 
   onColorChanged(paintedBlock: PaintBlockModel) {
-    const updatedObject = { id: paintedBlock.id, color: this.selectedColor };
-
-    const updatedObjects = this.canvasArray.map((row) => {
-      return row.map((object) => {
-        return object.id === updatedObject.id ? updatedObject : object;
-      });
-    });
-
-    this.updateArray(updatedObjects);
+    this.constructorConfig.canvasArray = this.constructorService.onColorChanged(
+      paintedBlock,
+      this.selectedColor
+    );
   }
 
   onDesignSave() {
@@ -133,7 +89,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     } else {
       // TODO: implement
       console.log('Saving...');
-      this.roter.navigate(['/designs']);
+      this.router.navigate(['/designs']);
     }
   }
 
