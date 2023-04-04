@@ -35,7 +35,8 @@
           />
         </div>
       </div>
-      <button (click)="setNewDimensions()" class="btn btn-primary">
+      <!--      TODO: popup to prevent accidental deletion of already created design -->
+      <button (click)="setNewDimensions()" mat-raised-button color="primary">
         Change the canvas size
       </button>
     </div>
@@ -53,12 +54,13 @@
     </div>
 
     <div>
-      <button (click)="clearAllCanvas()" class="btn btn-primary">
+      <button (click)="clearAllCanvas()" mat-raised-button color="danger">
         Clear all canvas
+      </button>
+
+      <button (click)="onDesignSave()" mat-raised-button color="primary">
+        Save this design
       </button>
     </div>
   </div>
 </div>
-
-<!--TODO:-->
-<!--possibility to save the design-->

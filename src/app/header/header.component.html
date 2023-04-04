@@ -6,6 +6,12 @@
   </div>
   <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
     <ul fxLayout fxLayoutGap="10px" class="navigation-items">
+      <li>
+        <a routerLink="/">Constructor</a>
+      </li>
+      <li *ngIf="isAuth">
+        <a routerLink="/designs">Saved Designs</a>
+      </li>
       <li *ngIf="!isAuth">
         <a routerLink="/signup">Signup</a>
       </li>
@@ -13,13 +19,7 @@
         <a routerLink="/login">Login</a>
       </li>
       <li *ngIf="isAuth">
-        <a routerLink="/constructor">Constructor</a>
-      </li>
-      <li *ngIf="isAuth">
-        <a routerLink="/designs">Saved Designs</a>
-      </li>
-      <li *ngIf="isAuth">
-        <a>Logout</a>
+        <a (click)="onLogout()">Logout</a>
       </li>
     </ul>
   </div>

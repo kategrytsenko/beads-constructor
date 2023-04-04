@@ -13,6 +13,7 @@ import { ConstructorPageModule } from './constructor-page/constructor-page.modul
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthService } from './auth/auth.service';
 import { HeaderModule } from './header/header.module';
+import { MotivateLoginPopupModule } from './motivate-login-popup/motivate-login-popup.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,6 +31,7 @@ import { HeaderModule } from './header/header.module';
     SavedDesignsPageModule,
     ConstructorPageModule,
     HeaderModule,
+    MotivateLoginPopupModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],
