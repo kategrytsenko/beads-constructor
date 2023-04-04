@@ -45,9 +45,9 @@
       <div class="">
         <app-beads-constructor
           [selectedColor]="selectedColor"
-          [beadsColumnArray]="beadsColumnArray"
-          [beadsRawArray]="beadsRawArray"
-          [canvasArray]="canvasArray"
+          [beadsColumnArray]="constructorConfig.beadsColumnArray"
+          [beadsRawArray]="constructorConfig.beadsRawArray"
+          [canvasArray]="constructorConfig.canvasArray"
           (colorChanged)="onColorChanged($event)"
         ></app-beads-constructor>
       </div>

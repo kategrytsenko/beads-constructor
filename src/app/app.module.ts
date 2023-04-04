@@ -14,6 +14,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthService } from './core/auth/auth.service';
 import { HeaderModule } from './core/header/header.module';
 import { MotivateLoginPopupModule } from './constructor-page/components/motivate-login-popup/motivate-login-popup.module';
+import { ConstructorService } from './services/constructor.service';
+import { ColorsService } from './services/colors.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -33,7 +35,7 @@ import { MotivateLoginPopupModule } from './constructor-page/components/motivate
     HeaderModule,
     MotivateLoginPopupModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService, ConstructorService, ColorsService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
