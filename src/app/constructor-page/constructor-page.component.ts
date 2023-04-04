@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
-import { PaintBlockModel } from '../models/paint-block.model';
+import { PaintBlockModel } from '../models/constructor-models';
 import { AuthService } from '../core/auth/auth.service';
 import { Subscription } from 'rxjs';
-import { MotivateLoginPopupComponent } from '../motivate-login-popup/motivate-login-popup.component';
+import { MotivateLoginPopupComponent } from './components/motivate-login-popup/motivate-login-popup.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 

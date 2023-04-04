@@ -1,12 +1,10 @@
 import {
   Component,
-  ElementRef,
   EventEmitter,
   Input,
   Output,
-  ViewChild,
 } from '@angular/core';
-import { PaintBlockModel } from '../models/paint-block.model';
+import { PaintBlockModel } from '../../../models/constructor-models';
 
 @Component({
   selector: 'app-beads-constructor',

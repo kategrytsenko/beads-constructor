@@ -6,14 +6,14 @@ import { CommonModule } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SignupModule } from './core/auth/signup/signup.module';
 import { LoginModule } from './core/auth/login/login.module';
-import { BeadsConstructorModule } from './beads-constructor/beads-constructor.module';
-import { PaintingPanelModule } from './painting-panel/painting-panel.module';
+import { BeadsConstructorModule } from './constructor-page/components/beads-constructor/beads-constructor.module';
+import { PaintingPanelModule } from './constructor-page/components/painting-panel/painting-panel.module';
 import { SavedDesignsPageModule } from './saved-designs-page/saved-designs-page.module';
 import { ConstructorPageModule } from './constructor-page/constructor-page.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AuthService } from './core/auth/auth.service';
 import { HeaderModule } from './core/header/header.module';
-import { MotivateLoginPopupModule } from './motivate-login-popup/motivate-login-popup.module';
+import { MotivateLoginPopupModule } from './constructor-page/components/motivate-login-popup/motivate-login-popup.module';
 
 @NgModule({
   declarations: [AppComponent],
