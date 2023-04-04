@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
-import { PaintBlockModel } from '../beads-constructor/paint-block.model';
-import { AuthService } from '../auth/auth.service';
+import { PaintBlockModel } from '../models/paint-block.model';
+import { AuthService } from '../core/auth/auth.service';
 import { Subscription } from 'rxjs';
 import { MotivateLoginPopupComponent } from '../motivate-login-popup/motivate-login-popup.component';
 import { MatDialog } from '@angular/material/dialog';

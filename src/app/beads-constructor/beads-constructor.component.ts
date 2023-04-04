@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { PaintBlockModel } from './paint-block.model';
+import { PaintBlockModel } from '../models/paint-block.model';
 
 @Component({
   selector: 'app-beads-constructor',
