@@ -5,6 +5,7 @@ import { AuthService } from '../auth/auth.service';
 import { Subscription } from 'rxjs';
 import { MotivateLoginPopupComponent } from '../motivate-login-popup/motivate-login-popup.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-constructor-page',
@@ -35,7 +36,11 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     localStorage.getItem('savedColors') || '[]'
   );
 
-  constructor (private authService: AuthService, private dialog: MatDialog) {}
+  constructor(
+    private authService: AuthService,
+    private dialog: MatDialog,
+    private roter: Router
+  ) {}
 
   ngOnInit() {
     this.authSubscription = this.authService.authChange$$.subscribe(
@@ -123,11 +128,12 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   onDesignSave() {
-    if(!this.isAuth) {
+    if (!this.isAuth) {
       this.dialog.open(MotivateLoginPopupComponent);
     } else {
       // TODO: implement
-      console.log('Saving...')
+      console.log('Saving...');
+      this.roter.navigate(['/designs']);
     }
   }
 

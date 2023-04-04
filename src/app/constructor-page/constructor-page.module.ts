@@ -19,7 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
     NgbModule,
     BrowserAnimationsModule,
 
-    MatButtonModule
+    MatButtonModule,
   ],
   providers: [],
 })

@@ -31,7 +31,7 @@ import { MotivateLoginPopupModule } from './motivate-login-popup/motivate-login-
     SavedDesignsPageModule,
     ConstructorPageModule,
     HeaderModule,
-    MotivateLoginPopupModule
+    MotivateLoginPopupModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],
