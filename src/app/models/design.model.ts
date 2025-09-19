@@ -1,4 +1,3 @@
-
 import { PaintBlockModel } from './constructor-models';
 
 export interface BeadDesign {

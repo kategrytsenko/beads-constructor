@@ -145,8 +145,7 @@ export class AuthService {
     console.error('Auth error:', error);
 
     const errorCode = error?.code || 'default';
-    const message =
-      ERROR_MESSAGES[errorCode] || ERROR_MESSAGES['default'];
+    const message = ERROR_MESSAGES[errorCode] || ERROR_MESSAGES['default'];
 
     this.showError(message);
     return message;
