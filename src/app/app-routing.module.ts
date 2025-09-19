@@ -5,6 +5,7 @@ import { ConstructorPageComponent } from './constructor-page/constructor-page.co
 import { SavedDesignsPageComponent } from './saved-designs-page/saved-designs-page.component';
 import { LoginComponent } from './core/auth/login/login.component';
 import { AuthGuard } from './core/auth/auth.guard';
+import { EmailVerifiedGuard } from './core/auth/email-verified.guard';
 
 const routes: Routes = [
   {
@@ -22,7 +23,14 @@ const routes: Routes = [
   {
     path: 'designs',
     component: SavedDesignsPageComponent,
-    canActivate: [AuthGuard],
+    canActivate: [EmailVerifiedGuard],
+  },
+  {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./core/auth/verify-email/verify-email.component').then(
+        (m) => m.VerifyEmailComponent
+      ),
   },
 ];
 

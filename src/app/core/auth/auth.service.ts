@@ -13,29 +13,48 @@ export class AuthService {
   user$ = this.afAuth.authState;
 
   constructor() {
-    this.afAuth.authState.subscribe((u) => this.authChange$$.next(!!u));
-
+    this.afAuth.authState.subscribe((u) =>
+      this.authChange$$.next(!!u && !!u.emailVerified)
+    );
     this.afAuth.setPersistence('local');
   }
 
-
-  async registerUser(authData: AuthData) {
-    try {
-      await this.afAuth.createUserWithEmailAndPassword(authData.email, authData.password);
-      // TODO: optional: (await this.afAuth.currentUser)?.sendEmailVerification();
-      this.authSuccessfully();
-    } catch (e) {
-      this.handleAuthError(e);
+  async registerUser({ email, password }: AuthData) {
+    const cred = await this.afAuth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+    const user = cred.user;
+    if (user) {
+      await user.sendEmailVerification({
+        url: `${window.location.origin}/verified`,
+        handleCodeInApp: false,
+      });
     }
+    await this.afAuth.signOut(); 
+    this.router.navigate(['/verify-email'], { queryParams: { email } });
   }
 
-  async login(authData: AuthData) {
-    try {
-      await this.afAuth.signInWithEmailAndPassword(authData.email, authData.password);
-      this.authSuccessfully();
-    } catch (e) {
-      this.handleAuthError(e);
+  async login({ email, password }: AuthData) {
+    const cred = await this.afAuth.signInWithEmailAndPassword(email, password);
+    if (!cred.user?.emailVerified) {
+      await this.afAuth.signOut();
+      this.router.navigate(['/verify-email'], { queryParams: { email } });
+      return;
     }
+    this.router.navigate(['/designs']);
+  }
+
+  async sendVerificationTo(email: string, password?: string) {
+    const cred = await this.afAuth.signInWithEmailAndPassword(
+      email,
+      password ?? ''
+    );
+    if (cred.user)
+      await cred.user.sendEmailVerification({
+        url: `${window.location.origin}/verified`,
+      });
+    await this.afAuth.signOut();
   }
 
   async logout() {
