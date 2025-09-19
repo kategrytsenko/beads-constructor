@@ -16,13 +16,20 @@ import { HeaderModule } from './core/header/header.module';
 import { MotivateLoginPopupModule } from './constructor-page/components/motivate-login-popup/motivate-login-popup.module';
 import { ConstructorService } from './services/constructor.service';
 import { ColorsService } from './services/colors.service';
+import { environment } from '../environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
+import { BrowserModule } from '@angular/platform-browser';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     AppRoutingModule,
     FormsModule,
-    CommonModule,
+    // CommonModule,
+    BrowserModule,
     NgbModule,
     BrowserAnimationsModule,
 
@@ -34,6 +41,10 @@ import { ColorsService } from './services/colors.service';
     ConstructorPageModule,
     HeaderModule,
     MotivateLoginPopupModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFireAuthModule,
+    AngularFirestoreModule.enablePersistence(), // offline cashe
+    AngularFireStorageModule, // Storage preview
   ],
   providers: [AuthService, ConstructorService, ColorsService],
   bootstrap: [AppComponent],

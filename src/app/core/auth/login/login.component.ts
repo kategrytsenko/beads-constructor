@@ -11,6 +11,7 @@ export class LoginComponent {
   constructor(private authService: AuthService) {}
 
   onSubmit(form: NgForm) {
+    if (form.invalid) return;
     this.authService.login({
       email: form.value.email,
       password: form.value.password,
