@@ -6,37 +6,43 @@
       <strong>{{ email || 'the address you provided' }}</strong>
       . Follow the link in the email, then sign in again.
     </p>
+    <form
+      #resendForm="ngForm"
+      (ngSubmit)="resend(resendForm)"
+      class="m-t-2 form-container"
+    >
+      <h4>Didn't get it?</h4>
 
-    <div class="m-t-2">
-      <form
-        (submit)="resend(emailEl, passEl); $event.preventDefault()"
-        class="form-container"
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          name="email"
+          ngModel
+          [value]="email"
+          required
+        />
+      </mat-form-field>
+
+      <app-password-input
+        label="Password"
+        placeholder="Enter your password"
+        name="password"
+        ngModel
+        [required]="true"
+      ></app-password-input>
+
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="loading"
+        type="submit"
       >
-        <h4>Didn't get it?</h4>
-        <mat-form-field>
-          <input
-            matInput
-            #emailEl
-            type="email"
-            placeholder="E-mail"
-            [value]="email"
-            required
-          />
-        </mat-form-field>
-        <mat-form-field>
-          <input
-            matInput
-            #passEl
-            type="password"
-            placeholder="Пароль"
-            required
-          />
-        </mat-form-field>
-        <button mat-raised-button color="primary" [disabled]="loading">
-          Resend verification email
-        </button>
-      </form>
-    </div>
+        Resend verification email
+      </button>
+    </form>
+
     <div class="actions" style="margin-top: 16px">
       <button
         mat-stroked-button
