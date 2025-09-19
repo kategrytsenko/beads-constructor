@@ -30,6 +30,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
   
+  // Стан збереження
   currentDesignId: string | null = null;
   isLoadingDesign = false;
   isSaving = false;
@@ -55,6 +56,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     
     this.constructorConfig = this.constructorService.getConstructorConfig();
     
+    // Перевіряємо, чи потрібно завантажити існуючий дизайн
     this.checkForDesignId();
   }
 
@@ -75,27 +77,62 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           this.rawBeadsAmount = design.dimensions.rows;
           this.columnBeadsAmount = design.dimensions.columns;
           
+          // ФІКС: Спочатку створюємо новий canvas з правильними розмірами
           this.constructorConfig = this.constructorService.resetConstructorConfig(
             this.rawBeadsAmount,
             this.columnBeadsAmount
           );
           
-          this.constructorConfig.canvasArray = design.canvasData;
+          // ФІКС: Потім застосовуємо збережені дані до кожної комірки
+          this.applyDesignDataToCanvas(design.canvasData);
           this.hasUnsavedChanges = false;
           
-          this.showSuccess(`Дизайн "${design.name}" завантажено`);
+          this.showSuccess(`Design "${design.name}" loaded`);
         } else {
-          this.showError('Дизайн не знайдено');
+          this.showError('Design not found');
           this.router.navigate(['/'], { queryParams: {} });
         }
         this.isLoadingDesign = false;
       },
       error: () => {
         this.isLoadingDesign = false;
-        this.showError('Помилка завантаження дизайну');
+        this.showError('Error loading design');
         this.router.navigate(['/'], { queryParams: {} });
       }
     });
+  }
+
+  private applyDesignDataToCanvas(savedCanvasData: PaintBlockModel[][]): void {
+    // Перевіряємо, чи розміри збереженого дизайну відповідають поточному canvas
+    if (!savedCanvasData || savedCanvasData.length === 0) {
+      return;
+    }
+
+    const savedRows = savedCanvasData.length;
+    const savedCols = savedCanvasData[0]?.length || 0;
+    const currentRows = this.constructorConfig.canvasArray.length;
+    const currentCols = this.constructorConfig.canvasArray[0]?.length || 0;
+
+    console.log(`Applying design: saved ${savedRows}x${savedCols}, current ${currentRows}x${currentCols}`);
+
+    // Застосовуємо збережені кольори до поточного canvas
+    for (let row = 0; row < Math.min(savedRows, currentRows); row++) {
+      for (let col = 0; col < Math.min(savedCols, currentCols); col++) {
+        if (savedCanvasData[row] && savedCanvasData[row][col]) {
+          // Використовуємо конструктор сервіс для правильного оновлення
+          const paintBlock: PaintBlockModel = {
+            ...this.constructorConfig.canvasArray[row][col],
+            color: savedCanvasData[row][col].color
+          };
+          
+          // Застосовуємо зміну через сервіс
+          this.constructorConfig.canvasArray = this.constructorService.onColorChanged(
+            paintBlock,
+            savedCanvasData[row][col].color
+          );
+        }
+      }
+    }
   }
 
   setWhite() {
