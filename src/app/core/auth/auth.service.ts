@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ERROR_MESSAGES, UI_MESSAGES } from './constants/auth-messages.const';
 
 @Injectable()
 export class AuthService {
@@ -13,19 +14,6 @@ export class AuthService {
 
   authChange$$ = new BehaviorSubject<boolean>(false);
   user$ = this.afAuth.authState;
-
-  private readonly ERROR_MESSAGES: Record<string, string> = {
-    'auth/email-already-in-use': 'E-mail вже використовується',
-    'auth/invalid-email': 'Некоректний e-mail',
-    'auth/weak-password': 'Надто слабкий пароль (мін. 6 символів)',
-    'auth/user-not-found': 'Користувача не знайдено',
-    'auth/wrong-password': 'Невірний пароль',
-    'auth/invalid-credential': 'Невірні облікові дані',
-    'auth/too-many-requests': 'Занадто багато спроб. Спробуйте пізніше',
-    'auth/network-request-failed':
-      'Помилка мережі. Перевірте підключення до інтернету',
-    default: 'Помилка авторизації. Спробуйте пізніше',
-  };
 
   private readonly VERIFICATION_CONFIG = {
     url: `${window.location.origin}/verified`,
@@ -59,7 +47,7 @@ export class AuthService {
         await this.afAuth.signOut();
 
         this.router.navigate(['/verify-email'], { queryParams: { email } });
-        this.showSuccess('Реєстрацію завершено! Перевірте електронну пошту');
+        this.showSuccess(UI_MESSAGES.registrationCompleted);
 
         return { success: true };
       }
@@ -81,7 +69,7 @@ export class AuthService {
       if (!cred.user?.emailVerified) {
         await this.afAuth.signOut();
         this.router.navigate(['/verify-email'], { queryParams: { email } });
-        this.showWarning('Підтвердіть електронну пошту для входу');
+        this.showWarning(UI_MESSAGES.verifyEmailToSignIn);
         return { success: false, error: 'Email not verified' };
       }
 
@@ -98,7 +86,7 @@ export class AuthService {
     password?: string
   ): Promise<AuthResult> {
     if (!password) {
-      this.showError("Пароль обов'язковий для повторного відправлення листа");
+      this.showError(UI_MESSAGES.passwordRequiredForResend);
       return { success: false, error: 'Password required' };
     }
 
@@ -111,7 +99,7 @@ export class AuthService {
       if (cred.user) {
         await cred.user.sendEmailVerification(this.VERIFICATION_CONFIG);
         await this.afAuth.signOut();
-        this.showSuccess('Лист для підтвердження відправлено');
+        this.showSuccess(UI_MESSAGES.verificationEmailSent);
         return { success: true };
       }
 
@@ -127,10 +115,10 @@ export class AuthService {
       await this.afAuth.signOut();
       this.authChange$$.next(false);
       this.router.navigate(['/login']);
-      this.showSuccess('Ви успішно вийшли з системи');
+      this.showSuccess(UI_MESSAGES.signedOutSuccess);
     } catch (error) {
       console.error('Logout error:', error);
-      this.showError('Помилка при виході з системи');
+      this.showError(UI_MESSAGES.signOutError);
     }
   }
 
@@ -150,7 +138,7 @@ export class AuthService {
   private authSuccessfully(): void {
     this.authChange$$.next(true);
     this.router.navigate(['/designs']);
-    this.showSuccess('Успішний вхід в систему!');
+    this.showSuccess(UI_MESSAGES.signedInSuccess);
   }
 
   private handleAuthError(error: any): string {
@@ -158,7 +146,7 @@ export class AuthService {
 
     const errorCode = error?.code || 'default';
     const message =
-      this.ERROR_MESSAGES[errorCode] || this.ERROR_MESSAGES['default'];
+      ERROR_MESSAGES[errorCode] || ERROR_MESSAGES['default'];
 
     this.showError(message);
     return message;
