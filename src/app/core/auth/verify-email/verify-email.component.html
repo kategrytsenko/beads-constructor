@@ -1,0 +1,54 @@
+<div class="page-container">
+  <section class="verify-email">
+    <h2 class="text-center m-b-2">Verify your email</h2>
+    <p>
+      We've sent an email to
+      <strong>{{ email || 'the address you provided' }}</strong>
+      . Follow the link in the email, then sign in again.
+    </p>
+
+    <div class="m-t-2">
+      <form
+        (submit)="resend(emailEl, passEl); $event.preventDefault()"
+        class="form-container"
+      >
+        <h4>Didn't get it?</h4>
+        <mat-form-field>
+          <input
+            matInput
+            #emailEl
+            type="email"
+            placeholder="E-mail"
+            [value]="email"
+            required
+          />
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            #passEl
+            type="password"
+            placeholder="Пароль"
+            required
+          />
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="loading">
+          Resend verification email
+        </button>
+      </form>
+    </div>
+    <div class="actions" style="margin-top: 16px">
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="alreadyVerified()"
+        [disabled]="loading"
+      >
+        I’ve verified my email
+      </button>
+    </div>
+
+    <p *ngIf="sent">Done! Please check your inbox and spam/junk folder.</p>
+    <p *ngIf="error" class="error">{{ error }}</p>
+  </section>
+</div>

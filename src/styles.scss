@@ -1,3 +1,32 @@
+.page-container {
+  padding: 2rem;
+}
+    
 .control-title {
   margin-right: 10px;
 }
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  margin: 0 auto;
+  form {
+    width: 100%;
+  }
+}
+
+// TODO: make generic
+.m-t-2 {
+  margin-block-start: 2rem;
+}
+
+.m-b-2 {
+  margin-block-end: 2rem;
+}
+
+
+
+.success-snackbar { background: #4caf50; }
+.warning-snackbar { background: #ff9800; }
+.error-snackbar { background: #f44336; }

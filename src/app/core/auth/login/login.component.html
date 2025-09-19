@@ -1,10 +1,5 @@
 <section class="login-form">
-  <form
-    fxLayout="column"
-    fxLayoutAlign="center center"
-    #f="ngForm"
-    (ngSubmit)="onSubmit(f)"
-  >
+  <form class="form-container m-t-2" #f="ngForm" (ngSubmit)="onSubmit(f)">
     <mat-form-field>
       <input
         type="email"
@@ -23,7 +18,7 @@
         E-mail is invalid
       </mat-error>
     </mat-form-field>
-    <mat-form-field hintLabel="Should be at least 6 characters long">
+    <mat-form-field>
       <input
         type="password"
         matInput

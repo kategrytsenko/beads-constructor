@@ -22,6 +22,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireStorageModule } from '@angular/fire/compat/storage';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,6 +33,7 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
     BrowserModule,
     NgbModule,
     BrowserAnimationsModule,
+    MatSnackBarModule,
 
     SignupModule,
     LoginModule,
