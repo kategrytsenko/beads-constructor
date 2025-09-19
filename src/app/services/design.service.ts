@@ -40,7 +40,7 @@ export class DesignService {
         ),
         catchError((error) => {
           console.error('Error getting user designs:', error);
-          this.showError(UI_DESIGN_MESSAGES_EN.designsLoadError);
+          this.showError(DESIGN_MESSAGES.designsLoadError);
           return of([]);
         })
       );
@@ -50,7 +50,7 @@ export class DesignService {
   async createDesign(designData: CreateDesignRequest): Promise<string | null> {
     const userId = this.getCurrentUserId();
     if (!userId) {
-      this.showError(UI_DESIGN_MESSAGES_EN.userNotAuthenticated);
+      this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return null;
     }
 
@@ -68,11 +68,11 @@ export class DesignService {
       const docRef = await this.firestore
         .collection(this.COLLECTION_NAME)
         .add(design);
-      this.showSuccess(UI_DESIGN_MESSAGES_EN.designSavedSuccess);
+      this.showSuccess(DESIGN_MESSAGES.designSavedSuccess);
       return docRef.id;
     } catch (error) {
       console.error('Error creating design:', error);
-      this.showError(UI_DESIGN_MESSAGES_EN.designSaveError);
+      this.showError(DESIGN_MESSAGES.designSaveError);
       return null;
     }
   }
@@ -81,7 +81,7 @@ export class DesignService {
   async updateDesign(updateData: UpdateDesignRequest): Promise<boolean> {
     const userId = this.getCurrentUserId();
     if (!userId) {
-      this.showError(UI_DESIGN_MESSAGES_EN.userNotAuthenticated);
+      this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
     }
 
@@ -102,11 +102,11 @@ export class DesignService {
         .collection(this.COLLECTION_NAME)
         .doc(id)
         .update(updatePayload);
-      this.showSuccess(UI_DESIGN_MESSAGES_EN.designUpdatedSuccess);
+      this.showSuccess(DESIGN_MESSAGES.designUpdatedSuccess);
       return true;
     } catch (error) {
       console.error('Error updating design:', error);
-      this.showError(UI_DESIGN_MESSAGES_EN.designUpdateError);
+      this.showError(DESIGN_MESSAGES.designUpdateError);
       return false;
     }
   }
@@ -115,7 +115,7 @@ export class DesignService {
   async deleteDesign(designId: string): Promise<boolean> {
     const userId = this.getCurrentUserId();
     if (!userId) {
-      this.showError(UI_DESIGN_MESSAGES_EN.userNotAuthenticated);
+      this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
     }
 
@@ -124,11 +124,11 @@ export class DesignService {
         .collection(this.COLLECTION_NAME)
         .doc(designId)
         .delete();
-      this.showSuccess(UI_DESIGN_MESSAGES_EN.designDeletedSuccess);
+      this.showSuccess(DESIGN_MESSAGES.designDeletedSuccess);
       return true;
     } catch (error) {
       console.error('Error deleting design:', error);
-      this.showError(UI_DESIGN_MESSAGES_EN.designDeleteError);
+      this.showError(DESIGN_MESSAGES.designDeleteError);
       return false;
     }
   }
@@ -147,7 +147,7 @@ export class DesignService {
         }),
         catchError((error) => {
           console.error('Error getting design:', error);
-          this.showError(UI_DESIGN_MESSAGES_EN.designLoadError);
+          this.showError(DESIGN_MESSAGES.designLoadError);
           return of(null);
         })
       );
@@ -166,7 +166,7 @@ export class DesignService {
         .toPromise();
 
       if (!designDoc?.exists) {
-        this.showError(UI_DESIGN_MESSAGES_EN.designNotFound);
+        this.showError(DESIGN_MESSAGES.designNotFound);
         return null;
       }
 
@@ -181,7 +181,7 @@ export class DesignService {
       return await this.createDesign(duplicateData);
     } catch (error) {
       console.error('Error duplicating design:', error);
-      this.showError(UI_DESIGN_MESSAGES_EN.designDuplicateError);
+      this.showError(DESIGN_MESSAGES.designDuplicateError);
       return null;
     }
   }
