@@ -19,36 +19,39 @@ export class DesignService {
   private readonly COLLECTION_NAME = 'beadDesigns';
 
   getUserDesigns(): Observable<BeadDesign[]> {
-  return from(this.getCurrentUserId()).pipe(
-    switchMap(userId => {
-      if (!userId) {
-        this.showError('User not authenticated');
-        return of([]);
-      }
+    return from(this.getCurrentUserId()).pipe(
+      switchMap(userId => {
+        console.log('Getting designs for userId:', userId); 
+        if (!userId) {
+          this.showError('User not authenticated');
+          return of([]);
+        }
 
-      return this.firestore
-        .collection<BeadDesign>(this.COLLECTION_NAME, ref => 
-          ref.where('userId', '==', userId)
-             .orderBy('updatedAt', 'desc')
-        )
-        .snapshotChanges();
-    }),
-    map(actions => actions.map(a => {
-      const data = a.payload.doc.data();
-      const id = a.payload.doc.id;
-      return { ...data, id } as BeadDesign;
-    })),
-    catchError(error => {
-      console.error('Error getting user designs:', error);
-      this.showError(DESIGN_MESSAGES.designsLoadError);
-      return of([]);
-    })
-  );
+        return this.firestore
+          .collection<BeadDesign>(this.COLLECTION_NAME, ref => 
+            ref.where('userId', '==', userId)
+               .orderBy('updatedAt', 'desc')
+          )
+          .snapshotChanges();
+      }),
+      map(actions => actions.map(a => {
+        const data = a.payload.doc.data();
+        const id = a.payload.doc.id;
+        return { ...data, id } as BeadDesign;
+      })),
+      catchError(error => {
+        console.error('Error getting user designs:', error);
+        this.showError(DESIGN_MESSAGES.designsLoadError);
+        return of([]);
+      })
+    );
   }
 
   // Створити новий дизайн
   async createDesign(designData: CreateDesignRequest): Promise<string | null> {
-    const userId = this.getCurrentUserId();
+    const userId = await this.getCurrentUserId();
+    console.log('Creating design for userId:', userId);
+    
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return null;
@@ -65,9 +68,13 @@ export class DesignService {
         isPublic: false,
       };
 
+      console.log('Design data to save:', design); 
+
       const docRef = await this.firestore
         .collection(this.COLLECTION_NAME)
         .add(design);
+      
+      console.log('Design saved with ID:', docRef.id); 
       this.showSuccess(DESIGN_MESSAGES.designSavedSuccess);
       return docRef.id;
     } catch (error) {
@@ -79,7 +86,9 @@ export class DesignService {
 
   // Оновити існуючий дизайн
   async updateDesign(updateData: UpdateDesignRequest): Promise<boolean> {
-    const userId = this.getCurrentUserId();
+    const userId = await this.getCurrentUserId();
+    console.log('Updating design for userId:', userId); 
+    
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
@@ -102,6 +111,7 @@ export class DesignService {
         .collection(this.COLLECTION_NAME)
         .doc(id)
         .update(updatePayload);
+      
       this.showSuccess(DESIGN_MESSAGES.designUpdatedSuccess);
       return true;
     } catch (error) {
@@ -113,7 +123,9 @@ export class DesignService {
 
   // Видалити дизайн
   async deleteDesign(designId: string): Promise<boolean> {
-    const userId = this.getCurrentUserId();
+    const userId = await this.getCurrentUserId(); 
+    console.log('Deleting design for userId:', userId); 
+    
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
@@ -124,6 +136,7 @@ export class DesignService {
         .collection(this.COLLECTION_NAME)
         .doc(designId)
         .delete();
+      
       this.showSuccess(DESIGN_MESSAGES.designDeletedSuccess);
       return true;
     } catch (error) {
@@ -194,6 +207,7 @@ export class DesignService {
   private async getCurrentUserId(): Promise<string | null> {
     try {
       const user = await this.authService.getUserOnce();
+      console.log('Current user from auth service:', user); 
       return user ? (user as any).uid : null;
     } catch (error) {
       console.error('Error getting current user:', error);
