@@ -1,4 +1,4 @@
-import { PaintBlockModel } from './constructor-models';
+import { PaintBlockModel } from './constructor.model';
 
 export interface BeadDesign {
   id?: string;

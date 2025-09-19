@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   ConstructorConfig,
   PaintBlockModel,
-} from '../models/constructor-models';
+} from '../models/constructor.model';
 import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
 
 @Injectable()

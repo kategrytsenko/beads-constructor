@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
   ConstructorConfig,
   PaintBlockModel,
-} from '../models/constructor-models';
+} from '../models/constructor.model';
 import { AuthService } from '../core/auth/auth.service';
 import { DesignService } from '../services/design.service';
 import { Subscription, firstValueFrom } from 'rxjs';

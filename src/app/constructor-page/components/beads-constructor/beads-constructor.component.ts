@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { PaintBlockModel } from '../../../models/constructor-models';
+import { PaintBlockModel } from '../../../models/constructor.model';
 
 @Component({
   selector: 'app-beads-constructor',

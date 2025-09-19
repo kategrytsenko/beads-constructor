@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PaintBlockModel } from './models/constructor-models';
+import { PaintBlockModel } from './models/constructor.model';
 import { generateCanvasArray, getArrayWithSettedLength } from './utils';
 
 @Component({
