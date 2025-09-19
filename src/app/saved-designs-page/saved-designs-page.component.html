@@ -1,1 +1,131 @@
-<p>saved-designs-page works!</p>
+<div class="saved-designs-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <mat-icon class="title-icon">collections</mat-icon>
+        My Designs
+      </h1>
+      
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="onCreateNew()"
+        class="create-new-btn">
+        <mat-icon>add</mat-icon>
+        Create New Design
+      </button>
+    </div>
+  </div>
+
+  <div class="designs-content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p class="loading-text">Loading your designs...</p>
+    </div>
+
+    <!-- Not Authenticated -->
+    <div *ngIf="!isLoading && !isAuth" class="auth-required">
+      <mat-icon class="auth-icon">lock</mat-icon>
+      <h2>Authentication Required</h2>
+      <p>Please log in to view your saved designs.</p>
+      <button mat-raised-button color="primary" routerLink="/login">
+        Log In
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && isAuth && designs.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">palette</mat-icon>
+      <h2>No Designs Yet</h2>
+      <p>Start creating beautiful bead patterns! Your saved designs will appear here.</p>
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="onCreateNew()"
+        class="create-first-btn">
+        <mat-icon>add</mat-icon>
+        Create Your First Design
+      </button>
+    </div>
+
+    <!-- Designs Grid -->
+    <div *ngIf="!isLoading && isAuth && designs.length > 0" class="designs-grid">
+      <div 
+        *ngFor="let design of designs; trackBy: trackByDesignId" 
+        class="design-card"
+        [class.card-hover]="true">
+        
+        <!-- Design Preview -->
+        <div class="design-preview" (click)="onEditDesign(design)">
+          <img 
+            [src]="getDesignPreview(design)" 
+            [alt]="design.name"
+            class="preview-image">
+          
+          <div class="preview-overlay">
+            <mat-icon class="edit-icon">edit</mat-icon>
+            <span class="edit-text">Edit Design</span>
+          </div>
+        </div>
+
+        <!-- Design Info -->
+        <div class="design-info">
+          <h3 class="design-name" [title]="design.name">
+            {{ design.name }}
+          </h3>
+          
+          <p *ngIf="design.description" 
+             class="design-description" 
+             [title]="design.description">
+            {{ design.description }}
+          </p>
+          
+          <div class="design-meta">
+            <span class="dimensions">
+              {{ design.dimensions.rows }} × {{ design.dimensions.columns }}
+            </span>
+            <span class="date">
+              {{ formatDate(design.updatedAt) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="design-actions">
+          <button 
+            mat-icon-button
+            (click)="onEditDesign(design)"
+            matTooltip="Edit Design"
+            class="action-btn edit-btn">
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button
+            (click)="onDuplicateDesign(design)"
+            matTooltip="Duplicate Design"
+            class="action-btn duplicate-btn">
+            <mat-icon>content_copy</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button
+            (click)="onShareDesign(design)"
+            matTooltip="Share Design"
+            class="action-btn share-btn">
+            <mat-icon>share</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button
+            (click)="onDeleteDesign(design)"
+            matTooltip="Delete Design"
+            class="action-btn delete-btn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

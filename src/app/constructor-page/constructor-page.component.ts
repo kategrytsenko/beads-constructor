@@ -4,12 +4,18 @@ import {
   PaintBlockModel,
 } from '../models/constructor-models';
 import { AuthService } from '../core/auth/auth.service';
-import { Subscription } from 'rxjs';
+import { DesignService } from '../services/design.service';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { MotivateLoginPopupComponent } from './components/motivate-login-popup/motivate-login-popup.component';
+import { SaveDesignDialogComponent, SaveDesignDialogData, SaveDesignDialogResult } from './components/save-design-dialog/save-design-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ConstructorService } from '../services/constructor.service';
 import { ColorsService } from '../services/colors.service';
+import { CreateDesignRequest, BeadDesign } from '../models/design.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-constructor-page',
@@ -19,21 +25,27 @@ import { ColorsService } from '../services/colors.service';
 export class ConstructorPageComponent implements OnInit, OnDestroy {
   authSubscription!: Subscription;
   isAuth = false;
-
   constructorConfig!: ConstructorConfig;
-
   rawBeadsAmount: number = this.constructorService.rawBeadsAmount;
   columnBeadsAmount: number = this.constructorService.columnBeadsAmount;
-
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
+  
+  // State for saving functionality
+  currentDesignId: string | null = null;
+  isLoadingDesign = false;
+  isSaving = false;
+  hasUnsavedChanges = false;
 
   constructor(
     private authService: AuthService,
+    private designService: DesignService,
     private dialog: MatDialog,
     private router: Router,
+    private route: ActivatedRoute,
     private constructorService: ConstructorService,
-    private colorsService: ColorsService
+    private colorsService: ColorsService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -42,8 +54,86 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
         this.isAuth = authStatus;
       }
     );
-
+    
     this.constructorConfig = this.constructorService.getConstructorConfig();
+    
+    // Check if we need to load an existing design
+    this.checkForDesignId();
+  }
+
+  private checkForDesignId(): void {
+    const designId = this.route.snapshot.queryParams['designId'];
+    if (designId && this.isAuth) {
+      this.loadDesign(designId);
+    }
+  }
+
+  private async loadDesign(designId: string): Promise<void> {
+    this.isLoadingDesign = true;
+    
+    this.designService.getDesignById(designId).subscribe({
+      next: (design: BeadDesign | null) => {
+        if (design) {
+          this.currentDesignId = design.id!;
+          this.rawBeadsAmount = design.dimensions.rows;
+          this.columnBeadsAmount = design.dimensions.columns;
+          
+          // First create new canvas with correct dimensions
+          this.constructorConfig = this.constructorService.resetConstructorConfig(
+            this.rawBeadsAmount,
+            this.columnBeadsAmount
+          );
+          
+          // Then apply saved data to each cell
+          this.applyDesignDataToCanvas(design.canvasData);
+          this.hasUnsavedChanges = false;
+          
+          this.showSuccess(`Design "${design.name}" loaded`);
+        } else {
+          this.showError('Design not found');
+          this.router.navigate(['/'], { queryParams: {} });
+        }
+        this.isLoadingDesign = false;
+      },
+      error: () => {
+        this.isLoadingDesign = false;
+        this.showError('Error loading design');
+        this.router.navigate(['/'], { queryParams: {} });
+      }
+    });
+  }
+
+  private applyDesignDataToCanvas(savedCanvasData: PaintBlockModel[][]): void {
+    // Check if saved design dimensions match current canvas
+    if (!savedCanvasData || savedCanvasData.length === 0) {
+      return;
+    }
+
+    const savedRows = savedCanvasData.length;
+    const savedCols = savedCanvasData[0]?.length || 0;
+    const currentRows = this.constructorConfig.canvasArray.length;
+    const currentCols = this.constructorConfig.canvasArray[0]?.length || 0;
+
+    console.log(`Applying design: saved ${savedRows}x${savedCols}, current ${currentRows}x${currentCols}`);
+
+    // Apply saved colors to current canvas
+    for (let row = 0; row < Math.min(savedRows, currentRows); row++) {
+      for (let col = 0; col < Math.min(savedCols, currentCols); col++) {
+        if (savedCanvasData[row] && savedCanvasData[row][col]) {
+          // Use constructor service for proper updating
+          const paintBlock: PaintBlockModel = {
+            ...this.constructorConfig.canvasArray[row][col],
+            color: savedCanvasData[row][col].color
+          };
+          
+          // Apply change through service
+          this.constructorConfig.canvasArray = this.constructorService.onColorChanged(
+            paintBlock,
+            savedCanvasData[row][col].color
+          );
+        }
+      }
+    }
   }
 
   setWhite() {
@@ -63,17 +153,68 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   clearAllCanvas() {
-    this.constructorConfig.canvasArray =
-      this.constructorService.clearAllCanvas();
+    const hasContent = this.constructorConfig.canvasArray.some(row => 
+      row.some(block => block.color !== '#ffffff')
+    );
+
+    if (hasContent) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Clear Canvas?',
+          message: 'Are you sure you want to clear the entire canvas? This action cannot be undone.',
+          confirmText: 'Clear',
+          cancelText: 'Cancel'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (confirmed) {
+          this.performClearCanvas();
+        }
+      });
+    } else {
+      this.performClearCanvas();
+    }
+  }
+
+  private performClearCanvas(): void {
+    this.constructorConfig.canvasArray = this.constructorService.clearAllCanvas();
+    this.hasUnsavedChanges = true;
   }
 
   setNewDimensions() {
-    this.clearAllCanvas();
+    const hasContent = this.constructorConfig.canvasArray.some(row => 
+      row.some(block => block.color !== '#ffffff')
+    );
 
+    if (hasContent) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Change Canvas Size?',
+          message: 'Changing the canvas size will result in losing the current design. Continue?',
+          confirmText: 'Change',
+          cancelText: 'Cancel'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(confirmed => {
+        if (confirmed) {
+          this.performDimensionChange();
+        }
+      });
+    } else {
+      this.performDimensionChange();
+    }
+  }
+
+  private performDimensionChange(): void {
+    this.clearAllCanvas();
     this.constructorConfig = this.constructorService.resetConstructorConfig(
       this.rawBeadsAmount,
       this.columnBeadsAmount
     );
+    this.currentDesignId = null; // New canvas = new design
+    this.hasUnsavedChanges = false;
   }
 
   onColorChanged(paintedBlock: PaintBlockModel) {
@@ -81,16 +222,135 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       paintedBlock,
       this.selectedColor
     );
+    this.hasUnsavedChanges = true;
   }
 
-  onDesignSave() {
+  async onDesignSave() {
     if (!this.isAuth) {
       this.dialog.open(MotivateLoginPopupComponent);
-    } else {
-      // TODO: implement
-      console.log('Saving...');
-      this.router.navigate(['/designs']);
+      return;
     }
+
+    // If updating existing design, load current data
+    let currentDesignData: BeadDesign | null = null;
+    if (this.currentDesignId) {
+      try {
+        // Get current design from database using firstValueFrom
+        currentDesignData = await firstValueFrom(
+          this.designService.getDesignById(this.currentDesignId).pipe(take(1))
+        );
+      } catch (error) {
+        console.error('Error loading current design data:', error);
+        currentDesignData = null;
+      }
+    }
+
+    const dialogData: SaveDesignDialogData = {
+      mode: this.currentDesignId ? 'update' : 'create',
+      existingName: currentDesignData?.name || '',
+      existingDescription: currentDesignData?.description || ''
+    };
+
+    const dialogRef = this.dialog.open(SaveDesignDialogComponent, {
+      data: dialogData,
+      disableClose: true,
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result: SaveDesignDialogResult | null) => {
+      if (result) {
+        await this.saveDesign(result);
+      }
+    });
+  }
+
+  private async saveDesign(dialogResult: SaveDesignDialogResult): Promise<void> {
+    this.isSaving = true;
+
+    try {
+      const designData: CreateDesignRequest = {
+        name: dialogResult.name,
+        description: dialogResult.description,
+        canvasData: JSON.parse(JSON.stringify(this.constructorConfig.canvasArray)), // deep copy
+        dimensions: {
+          rows: this.rawBeadsAmount,
+          columns: this.columnBeadsAmount
+        }
+      };
+
+      if (this.currentDesignId) {
+        // Update existing design
+        const success = await this.designService.updateDesign({
+          id: this.currentDesignId,
+          ...designData
+        });
+        
+        if (success) {
+          this.hasUnsavedChanges = false;
+        }
+      } else {
+        // Create new design
+        const newDesignId = await this.designService.createDesign(designData);
+        
+        if (newDesignId) {
+          this.currentDesignId = newDesignId;
+          this.hasUnsavedChanges = false;
+          
+          // Update URL with new ID
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { designId: newDesignId },
+            queryParamsHandling: 'merge'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error saving design:', error);
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  async onCreateNew(): Promise<void> {
+    if (this.hasUnsavedChanges) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Unsaved Changes',
+          message: 'You have unsaved changes. Are you sure you want to create a new design?',
+          confirmText: 'Create New',
+          cancelText: 'Cancel'
+        }
+      });
+
+      const confirmed = await firstValueFrom(dialogRef.afterClosed());
+      if (!confirmed) return;
+    }
+
+    this.currentDesignId = null;
+    this.constructorConfig.canvasArray = this.constructorService.clearAllCanvas();
+    this.hasUnsavedChanges = false;
+    
+    // Clear URL parameters
+    this.router.navigate(['/'], { queryParams: {} });
+    this.showSuccess('Created new design');
+  }
+
+  onViewSavedDesigns(): void {
+    this.router.navigate(['/designs']);
+  }
+
+  private showSuccess(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
   }
 
   ngOnDestroy() {
