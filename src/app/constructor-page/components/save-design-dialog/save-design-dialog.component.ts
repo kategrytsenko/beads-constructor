@@ -33,23 +33,27 @@ export class SaveDesignDialogComponent {
   private createForm(): FormGroup {
     return this.fb.group({
       name: [
-        this.data.existingName || '', 
-        [Validators.required, Validators.minLength(2), Validators.maxLength(50)]
+        this.data.existingName || '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+        ],
       ],
       description: [
-        this.data.existingDescription || '', 
-        [Validators.maxLength(200)]
-      ]
+        this.data.existingDescription || '',
+        [Validators.maxLength(200)],
+      ],
     });
   }
 
   onSave(): void {
     if (this.designForm.valid) {
       this.isLoading = true;
-      
+
       const result: SaveDesignDialogResult = {
         name: this.designForm.get('name')?.value.trim(),
-        description: this.designForm.get('description')?.value.trim() || ''
+        description: this.designForm.get('description')?.value.trim() || '',
       };
 
       // Імітуємо невелику затримку для UX

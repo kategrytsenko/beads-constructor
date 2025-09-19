@@ -8,18 +8,21 @@ import { Subscription } from 'rxjs';
 import { BeadDesign } from '../models/design.model';
 import { DesignService } from '../services/design.service';
 import { AuthService } from '../core/auth/auth.service';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../shared/components/confirm-dialog/confirm-dialog.component';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogData,
+} from '../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-saved-designs-page',
   templateUrl: './saved-designs-page.component.html',
-  styleUrls: ['./saved-designs-page.component.scss']
+  styleUrls: ['./saved-designs-page.component.scss'],
 })
 export class SavedDesignsPageComponent implements OnInit, OnDestroy {
   designs: BeadDesign[] = [];
   isLoading = true;
   isAuth = false;
-  
+
   private designsSubscription?: Subscription;
   private authSubscription?: Subscription;
 
@@ -47,7 +50,7 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
 
   private loadUserDesigns(): void {
     this.isLoading = true;
-    
+
     this.designsSubscription = this.designService.getUserDesigns().subscribe({
       next: (designs: BeadDesign[]) => {
         this.designs = designs;
@@ -57,7 +60,7 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
         console.error('Error loading designs:', error);
         this.showError('Failed to load designs');
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -66,8 +69,8 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
   }
 
   onEditDesign(design: BeadDesign): void {
-    this.router.navigate(['/'], { 
-      queryParams: { designId: design.id } 
+    this.router.navigate(['/'], {
+      queryParams: { designId: design.id },
     });
   }
 
@@ -76,19 +79,22 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
       title: 'Duplicate Design',
       message: `Create a copy of "${design.name}"?`,
       confirmText: 'Duplicate',
-      cancelText: 'Cancel'
+      cancelText: 'Cancel',
     };
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: dialogData,
-      width: '400px'
+      width: '400px',
     });
 
     dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
       if (confirmed) {
         const newName = `${design.name} (Copy)`;
-        const newDesignId = await this.designService.duplicateDesign(design.id!, newName);
-        
+        const newDesignId = await this.designService.duplicateDesign(
+          design.id!,
+          newName
+        );
+
         if (newDesignId) {
           this.showSuccess('Design duplicated successfully');
           // Designs will auto-refresh due to observable subscription
@@ -103,12 +109,12 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
       message: `Are you sure you want to delete "${design.name}"? This action cannot be undone.`,
       confirmText: 'Delete',
       cancelText: 'Cancel',
-      confirmColor: 'warn'
+      confirmColor: 'warn',
     };
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: dialogData,
-      width: '400px'
+      width: '400px',
     });
 
     dialogRef.afterClosed().subscribe(async (confirmed: boolean) => {
@@ -147,7 +153,7 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   }
 
@@ -158,21 +164,21 @@ export class SavedDesignsPageComponent implements OnInit, OnDestroy {
   private showSuccess(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
-      panelClass: ['success-snackbar']
+      panelClass: ['success-snackbar'],
     });
   }
 
   private showError(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 5000,
-      panelClass: ['error-snackbar']
+      panelClass: ['error-snackbar'],
     });
   }
 
   private showInfo(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 4000,
-      panelClass: ['info-snackbar']
+      panelClass: ['info-snackbar'],
     });
   }
 

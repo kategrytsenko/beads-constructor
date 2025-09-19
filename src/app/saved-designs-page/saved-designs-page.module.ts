@@ -11,9 +11,7 @@ import { SavedDesignsPageComponent } from './saved-designs-page.component';
 import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
-  declarations: [
-    SavedDesignsPageComponent
-  ],
+  declarations: [SavedDesignsPageComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -22,10 +20,8 @@ import { SharedModule } from '../shared/shared.module';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatSnackBarModule,
-    SharedModule
+    SharedModule,
   ],
-  exports: [
-    SavedDesignsPageComponent
-  ]
+  exports: [SavedDesignsPageComponent],
 })
-export class SavedDesignsPageModule { }
+export class SavedDesignsPageModule {}

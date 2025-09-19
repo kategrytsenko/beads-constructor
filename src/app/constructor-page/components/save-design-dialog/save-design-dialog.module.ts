@@ -10,9 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { SaveDesignDialogComponent } from './save-design-dialog.component';
 
 @NgModule({
-  declarations: [
-    SaveDesignDialogComponent
-  ],
+  declarations: [SaveDesignDialogComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -20,10 +18,8 @@ import { SaveDesignDialogComponent } from './save-design-dialog.component';
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
   ],
-  exports: [
-    SaveDesignDialogComponent
-  ]
+  exports: [SaveDesignDialogComponent],
 })
-export class SaveDesignDialogModule { }
+export class SaveDesignDialogModule {}
