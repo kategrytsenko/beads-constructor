@@ -6,6 +6,7 @@ import { SavedDesignsPageComponent } from './saved-designs-page/saved-designs-pa
 import { LoginComponent } from './core/auth/login/login.component';
 import { AuthGuard } from './core/auth/auth.guard';
 import { EmailVerifiedGuard } from './core/auth/email-verified.guard';
+import { ProfilePageComponent } from './profile-page/profile-page.component';
 
 const routes: Routes = [
   {
@@ -32,11 +33,16 @@ const routes: Routes = [
         (m) => m.VerifyEmailComponent
       ),
   },
+  {
+    path: 'profile',
+    component: ProfilePageComponent,
+    canActivate: [EmailVerifiedGuard],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
-  providers: [AuthGuard],
+  providers: [AuthGuard, EmailVerifiedGuard],
 })
 export class AppRoutingModule {}

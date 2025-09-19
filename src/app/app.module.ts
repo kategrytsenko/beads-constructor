@@ -34,6 +34,7 @@ import { AuthService } from './core/auth/auth.service';
 import { ConstructorService } from './services/constructor.service';
 import { ColorsService } from './services/colors.service';
 import { DesignService } from './services/design.service';
+import { ProfilePageModule } from './profile-page/profile-page.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -62,6 +63,7 @@ import { DesignService } from './services/design.service';
     ConstructorPageModule, // Містить BeadsConstructorModule та PaintingPanelModule
     HeaderModule,
     MotivateLoginPopupModule,
+    ProfilePageModule,
 
     // Shared modules
     SharedModule,

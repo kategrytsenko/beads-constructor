@@ -1,0 +1,287 @@
+<div class="profile-page">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!isLoading" class="profile-content">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <mat-icon class="title-icon">person</mat-icon>
+          My Profile
+        </h1>
+
+        <div class="header-actions">
+          <button
+            mat-button
+            (click)="onEditToggle()"
+            [disabled]="isSaving"
+            class="edit-btn"
+          >
+            <mat-icon>{{ isEditing ? 'cancel' : 'edit' }}</mat-icon>
+            {{ isEditing ? 'Cancel' : 'Edit Profile' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Layout -->
+    <div class="profile-layout">
+      <!-- Left Column - Profile Form -->
+      <div class="profile-form-section">
+        <mat-card class="profile-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>account_circle</mat-icon>
+              Profile Information
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()">
+              <!-- Display Name -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Display Name</mat-label>
+                <input
+                  matInput
+                  formControlName="displayName"
+                  [readonly]="!isEditing"
+                  placeholder="Enter your display name"
+                />
+                <mat-error
+                  *ngIf="
+                    profileForm.get('displayName')?.touched &&
+                    profileForm.get('displayName')?.invalid
+                  "
+                >
+                  {{ getErrorMessage('displayName') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Email (readonly) -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" readonly />
+                <mat-hint>Email cannot be changed</mat-hint>
+              </mat-form-field>
+
+              <!-- Bio -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Bio</mat-label>
+                <textarea
+                  matInput
+                  formControlName="bio"
+                  [readonly]="!isEditing"
+                  rows="3"
+                  maxlength="500"
+                  placeholder="Tell us about yourself..."
+                ></textarea>
+                <mat-hint>
+                  {{ profileForm.get('bio')?.value?.length || 0 }}/500
+                </mat-hint>
+                <mat-error
+                  *ngIf="
+                    profileForm.get('bio')?.touched &&
+                    profileForm.get('bio')?.invalid
+                  "
+                >
+                  {{ getErrorMessage('bio') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Location -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Location</mat-label>
+                <input
+                  matInput
+                  formControlName="location"
+                  [readonly]="!isEditing"
+                  placeholder="Where are you from?"
+                />
+                <mat-error
+                  *ngIf="
+                    profileForm.get('location')?.touched &&
+                    profileForm.get('location')?.invalid
+                  "
+                >
+                  {{ getErrorMessage('location') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Website -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Website</mat-label>
+                <input
+                  matInput
+                  formControlName="website"
+                  [readonly]="!isEditing"
+                  placeholder="https://your-website.com"
+                />
+                <mat-error
+                  *ngIf="
+                    profileForm.get('website')?.touched &&
+                    profileForm.get('website')?.invalid
+                  "
+                >
+                  {{ getErrorMessage('website') }}
+                </mat-error>
+              </mat-form-field>
+
+              <!-- Save Button -->
+              <div *ngIf="isEditing" class="form-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="profileForm.invalid || isSaving"
+                  class="save-btn"
+                >
+                  <mat-icon *ngIf="isSaving" class="spinning">
+                    hourglass_empty
+                  </mat-icon>
+                  <mat-icon *ngIf="!isSaving">save</mat-icon>
+                  {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                </button>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Account Settings -->
+        <mat-card class="settings-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>settings</mat-icon>
+              Account Settings
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="settings-actions">
+              <button
+                mat-stroked-button
+                color="primary"
+                (click)="onChangePassword()"
+                class="setting-btn"
+              >
+                <mat-icon>lock</mat-icon>
+                Change Password
+              </button>
+
+              <button
+                mat-stroked-button
+                color="accent"
+                (click)="onExportData()"
+                class="setting-btn"
+              >
+                <mat-icon>download</mat-icon>
+                Export My Data
+              </button>
+
+              <button
+                mat-stroked-button
+                color="warn"
+                (click)="onDeleteAccount()"
+                class="setting-btn danger"
+              >
+                <mat-icon>delete_forever</mat-icon>
+                Delete Account
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Right Column - Stats & Recent Designs -->
+      <div class="profile-stats-section">
+        <!-- User Statistics -->
+        <mat-card class="stats-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>assessment</mat-icon>
+              Your Statistics
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-number">{{ userStats.totalDesigns }}</div>
+                <div class="stat-label">Total Designs</div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-number">{{ userStats.createdThisMonth }}</div>
+                <div class="stat-label">This Month</div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-number">
+                  {{
+                    userStats.lastDesignDate
+                      ? formatDate(userStats.lastDesignDate)
+                      : 'Never'
+                  }}
+                </div>
+                <div class="stat-label">Last Design</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Recent Designs -->
+        <mat-card class="recent-designs-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>history</mat-icon>
+              Recent Designs
+            </mat-card-title>
+            <mat-card-subtitle>
+              <a routerLink="/designs" class="view-all-link">View All</a>
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div *ngIf="recentDesigns.length === 0" class="no-designs">
+              <mat-icon class="no-designs-icon">palette</mat-icon>
+              <p>No designs yet</p>
+              <button mat-raised-button color="primary" routerLink="/">
+                Create Your First Design
+              </button>
+            </div>
+
+            <div *ngIf="recentDesigns.length > 0" class="recent-designs-list">
+              <div
+                *ngFor="let design of recentDesigns"
+                class="recent-design-item"
+                [routerLink]="['/']"
+                [queryParams]="{ designId: design.id }"
+              >
+                <div class="design-thumbnail">
+                  <img
+                    [src]="design.thumbnail"
+                    [alt]="design.name"
+                    class="thumbnail-image"
+                  />
+                </div>
+
+                <div class="design-info">
+                  <h4 class="design-name">{{ design.name }}</h4>
+                  <p class="design-date">{{ formatDate(design.updatedAt) }}</p>
+                  <div class="design-dimensions">
+                    {{ design.dimensions.rows }} ×
+                    {{ design.dimensions.columns }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
