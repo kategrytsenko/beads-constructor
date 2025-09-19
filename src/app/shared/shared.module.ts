@@ -7,17 +7,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 @NgModule({
-  declarations: [
-    ConfirmDialogComponent
-  ],
-  imports: [
-    CommonModule,
+  declarations: [ConfirmDialogComponent],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  exports: [
+    ConfirmDialogComponent,
+    // Re-export commonly used Material modules
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
   ],
-  exports: [
-    ConfirmDialogComponent
-  ]
 })
-export class SharedModule { }
+export class SharedModule {}

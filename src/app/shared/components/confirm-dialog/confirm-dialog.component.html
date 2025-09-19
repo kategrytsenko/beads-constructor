@@ -9,20 +9,17 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="dialog-actions">
-    <button 
-      mat-button 
-      type="button" 
-      (click)="onCancel()"
-      class="cancel-button">
+    <button mat-button type="button" (click)="onCancel()" class="cancel-button">
       {{ data.cancelText }}
     </button>
-    
-    <button 
-      mat-raised-button 
+
+    <button
+      mat-raised-button
       [color]="data.confirmColor"
       type="button"
       (click)="onConfirm()"
-      class="confirm-button">
+      class="confirm-button"
+    >
       {{ data.confirmText }}
     </button>
   </mat-dialog-actions>

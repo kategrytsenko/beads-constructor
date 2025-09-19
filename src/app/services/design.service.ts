@@ -20,38 +20,40 @@ export class DesignService {
 
   getUserDesigns(): Observable<BeadDesign[]> {
     return from(this.getCurrentUserId()).pipe(
-      switchMap(userId => {
-        console.log('Getting designs for userId:', userId); 
+      switchMap((userId) => {
+        console.log('Getting designs for userId:', userId);
         if (!userId) {
           this.showError('User not authenticated');
           return of([]);
         }
 
         return this.firestore
-          .collection<any>(this.COLLECTION_NAME, ref => 
-            ref.where('userId', '==', userId)
-               .orderBy('updatedAt', 'desc')
+          .collection<any>(this.COLLECTION_NAME, (ref) =>
+            ref.where('userId', '==', userId).orderBy('updatedAt', 'desc')
           )
           .snapshotChanges();
       }),
-      map(actions => actions.map(a => {
-        const data = a.payload.doc.data();
-        const id = a.payload.doc.id;
-        
-        // Десеріалізуємо canvasData з JSON string назад у масив
-        const design: BeadDesign = {
-          ...data,
-          id,
-          canvasData: typeof data.canvasData === 'string' 
-            ? JSON.parse(data.canvasData) 
-            : data.canvasData,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date()
-        };
-        
-        return design;
-      })),
-      catchError(error => {
+      map((actions) =>
+        actions.map((a) => {
+          const data = a.payload.doc.data();
+          const id = a.payload.doc.id;
+
+          // Десеріалізуємо canvasData з JSON string назад у масив
+          const design: BeadDesign = {
+            ...data,
+            id,
+            canvasData:
+              typeof data.canvasData === 'string'
+                ? JSON.parse(data.canvasData)
+                : data.canvasData,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+          };
+
+          return design;
+        })
+      ),
+      catchError((error) => {
         console.error('Error getting user designs:', error);
         this.showError(DESIGN_MESSAGES.designsLoadError);
         return of([]);
@@ -62,8 +64,8 @@ export class DesignService {
   // Створити новий дизайн
   async createDesign(designData: CreateDesignRequest): Promise<string | null> {
     const userId = await this.getCurrentUserId();
-    console.log('Creating design for userId:', userId); 
-    
+    console.log('Creating design for userId:', userId);
+
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return null;
@@ -81,16 +83,16 @@ export class DesignService {
         thumbnail: this.generateThumbnail(designData.canvasData),
         isPublic: false,
         // Серіалізуємо canvasData як JSON string
-        canvasData: JSON.stringify(designData.canvasData)
+        canvasData: JSON.stringify(designData.canvasData),
       };
 
-      console.log('Design data to save:', design); 
+      console.log('Design data to save:', design);
 
       const docRef = await this.firestore
         .collection(this.COLLECTION_NAME)
         .add(design);
-      
-      console.log('Design saved with ID:', docRef.id); 
+
+      console.log('Design saved with ID:', docRef.id);
       this.showSuccess(DESIGN_MESSAGES.designSavedSuccess);
       return docRef.id;
     } catch (error) {
@@ -103,8 +105,8 @@ export class DesignService {
   // Оновити існуючий дизайн
   async updateDesign(updateData: UpdateDesignRequest): Promise<boolean> {
     const userId = await this.getCurrentUserId();
-    console.log('Updating design for userId:', userId); 
-    
+    console.log('Updating design for userId:', userId);
+
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
@@ -118,19 +120,23 @@ export class DesignService {
 
       // Додаємо тільки ті поля, які передані
       if (dataToUpdate.name) updatePayload.name = dataToUpdate.name;
-      if (dataToUpdate.description !== undefined) updatePayload.description = dataToUpdate.description;
-      if (dataToUpdate.dimensions) updatePayload.dimensions = dataToUpdate.dimensions;
+      if (dataToUpdate.description !== undefined)
+        updatePayload.description = dataToUpdate.description;
+      if (dataToUpdate.dimensions)
+        updatePayload.dimensions = dataToUpdate.dimensions;
 
       if (dataToUpdate.canvasData) {
         updatePayload.canvasData = JSON.stringify(dataToUpdate.canvasData); // Серіалізуємо
-        updatePayload.thumbnail = this.generateThumbnail(dataToUpdate.canvasData);
+        updatePayload.thumbnail = this.generateThumbnail(
+          dataToUpdate.canvasData
+        );
       }
 
       await this.firestore
         .collection(this.COLLECTION_NAME)
         .doc(id)
         .update(updatePayload);
-      
+
       this.showSuccess(DESIGN_MESSAGES.designUpdatedSuccess);
       return true;
     } catch (error) {
@@ -143,8 +149,8 @@ export class DesignService {
   // Видалити дизайн
   async deleteDesign(designId: string): Promise<boolean> {
     const userId = await this.getCurrentUserId();
-    console.log('Deleting design for userId:', userId); 
-    
+    console.log('Deleting design for userId:', userId);
+
     if (!userId) {
       this.showError(DESIGN_MESSAGES.userNotAuthenticated);
       return false;
@@ -155,7 +161,7 @@ export class DesignService {
         .collection(this.COLLECTION_NAME)
         .doc(designId)
         .delete();
-      
+
       this.showSuccess(DESIGN_MESSAGES.designDeletedSuccess);
       return true;
     } catch (error) {
@@ -175,20 +181,21 @@ export class DesignService {
         map((action) => {
           const data = action.payload.data();
           const id = action.payload.id;
-          
+
           if (!data) return null;
-          
+
           // Десеріалізуємо canvasData
           const design: BeadDesign = {
             ...data,
             id,
-            canvasData: typeof data.canvasData === 'string' 
-              ? JSON.parse(data.canvasData) 
-              : data.canvasData,
+            canvasData:
+              typeof data.canvasData === 'string'
+                ? JSON.parse(data.canvasData)
+                : data.canvasData,
             createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date()
+            updatedAt: data.updatedAt?.toDate() || new Date(),
           };
-          
+
           return design;
         }),
         catchError((error) => {
@@ -217,12 +224,13 @@ export class DesignService {
       }
 
       const originalData = designDoc.data() as any;
-      
+
       // Десеріалізуємо canvasData для дублювання
-      const canvasData = typeof originalData.canvasData === 'string' 
-        ? JSON.parse(originalData.canvasData) 
-        : originalData.canvasData;
-      
+      const canvasData =
+        typeof originalData.canvasData === 'string'
+          ? JSON.parse(originalData.canvasData)
+          : originalData.canvasData;
+
       const duplicateData: CreateDesignRequest = {
         name: newName,
         description: originalData.description || '',
@@ -246,7 +254,7 @@ export class DesignService {
   private async getCurrentUserId(): Promise<string | null> {
     try {
       const user = await this.authService.getUserOnce();
-      console.log('Current user from auth service:', user); 
+      console.log('Current user from auth service:', user);
       return user ? (user as any).uid : null;
     } catch (error) {
       console.error('Error getting current user:', error);

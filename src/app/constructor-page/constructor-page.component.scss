@@ -1,10 +1,242 @@
+// Main page layout
+.constructor-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+// Page header
+.page-header {
+  background: white;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 14px;
+    
+    mat-icon {
+      margin-right: 8px;
+      color: #2196f3;
+    }
+    
+    .separator {
+      margin: 0 8px;
+    }
+    
+    .current {
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .unsaved-indicator {
+      color: #ff9800;
+      font-weight: bold;
+      font-size: 18px;
+      margin-left: 4px;
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+// Main constructor layout
+.constructor-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 0;
+  overflow: hidden;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: 240px 1fr 240px;
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+// Sidebars
+.sidebar {
+  background: white;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  
+  &.sidebar-right {
+    border-right: none;
+    border-left: 1px solid #e0e0e0;
+  }
+  
+  @media (max-width: 768px) {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    max-height: 200px;
+  }
+}
+
+.sidebar-section {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #666;
+    }
+  }
+}
+
+// Size controls in sidebar
+.size-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  .size-field {
+    width: 100%;
+  }
+  
+  .size-input {
+    text-align: center;
+  }
+  
+  .apply-size-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+// Action buttons in sidebar
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  .clear-btn,
+  .save-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    padding: 12px;
+  }
+}
+
+// Patterns placeholder
+.patterns-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  
+  .placeholder-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// Canvas area
+.canvas-area {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  position: relative;
+}
+
+.canvas-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  
+  .canvas-info {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .toolbar-right {
+    display: flex;
+    gap: 4px;
+    
+    .zoom-btn {
+      width: 36px;
+      height: 36px;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+.canvas-container {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.canvas-wrapper {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+}
+
+// Loading overlay (update existing)
 .loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,142 +250,24 @@
   }
 }
 
-// Design header
-.design-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+// Mobile FAB
+.fab-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
   
-  .design-info {
-    .design-title {
-      margin: 0;
-      color: #333;
-      font-size: 20px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      
-      .unsaved-indicator {
-        color: #ff9800;
-        font-weight: bold;
-        font-size: 24px;
-      }
-    }
-  }
-  
-  .design-actions {
-    display: flex;
-    gap: 8px;
-    
-    .action-btn {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      min-width: auto;
-    }
+  .save-fab {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }
 
-// Updated dimensions controls
-.dimensions-controls {
-  display: flex;
-  align-items: end;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  
-  .dimensions-controls-column {
-    flex: 1;
-    
-    .control-title {
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #333;
-      font-size: 14px;
-    }
-    
-    .controls-container-input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-      
-      &:focus {
-        outline: none;
-        border-color: #2196f3;
-        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-      }
-    }
-  }
-  
-  .apply-dimensions-btn {
-    flex-shrink: 0;
-    height: 40px;
-  }
+// Spinning animation for loading states
+.spinning {
+  animation: spin 2s linear infinite;
 }
 
-// Canvas container
-.beads-canvas-container {
-  margin-bottom: 24px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-}
-
-// Bottom actions
-.bottom-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
-  .left-actions,
-  .right-actions {
-    display: flex;
-    gap: 12px;
-  }
-  
-  .clear-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  
-  .save-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    min-width: 140px;
-    
-    mat-icon {
-      &.loading-icon {
-        animation: rotate 2s linear infinite;
-      }
-    }
-    
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-}
-
-@keyframes rotate {
+@keyframes spin {
   from {
     transform: rotate(0deg);
   }
@@ -162,41 +276,48 @@
   }
 }
 
-// Responsive design
+// Mobile responsive adjustments
 @media (max-width: 768px) {
-  .design-header {
+  .page-header {
+    padding: 12px 16px;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: stretch;
     
-    .design-actions {
+    .header-actions {
       justify-content: center;
     }
   }
   
-  .dimensions-controls {
-    flex-direction: column;
-    gap: 16px;
+  .sidebar-section {
+    padding: 16px;
+  }
+  
+  .canvas-wrapper {
+    padding: 16px;
+  }
+  
+  .size-controls {
+    .size-field {
+      flex-direction: row;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .constructor-layout {
+    grid-template-rows: auto 1fr;
     
-    .apply-dimensions-btn {
-      width: 100%;
+    .sidebar-right {
+      display: none; // Hide right sidebar on very small screens
     }
   }
   
-  .bottom-actions {
-    flex-direction: column;
-    gap: 16px;
+  .page-header {
+    padding: 8px 12px;
     
-    .left-actions,
-    .right-actions {
-      width: 100%;
-      justify-content: center;
-    }
-    
-    .clear-btn,
-    .save-btn {
-      width: 100%;
-      justify-content: center;
+    .breadcrumb {
+      font-size: 12px;
     }
   }
 }

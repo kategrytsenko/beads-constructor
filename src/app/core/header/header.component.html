@@ -1,26 +1,159 @@
-<mat-toolbar color="primary">
-  <div>
-    <a routerLink="/">
-      <mat-icon>home</mat-icon>
+<mat-toolbar color="primary" class="app-header">
+  <!-- Logo/Brand Section -->
+  <div class="brand-section">
+    <a routerLink="/" class="brand-link">
+      <mat-icon class="brand-icon">palette</mat-icon>
+      <span class="brand-text">Beads Constructor</span>
     </a>
   </div>
-  <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
-    <ul fxLayout fxLayoutGap="10px" class="navigation-items">
-      <li>
-        <a routerLink="/">Constructor</a>
+
+  <!-- Desktop Navigation -->
+  <nav class="desktop-nav" fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/" class="nav-link" [class.active]="isActiveRoute('/')">
+          <mat-icon class="nav-icon">build</mat-icon>
+          <span>Constructor</span>
+        </a>
       </li>
-      <li *ngIf="isAuth">
-        <a routerLink="/designs">My Designs</a>
+
+      <li class="nav-item" *ngIf="isAuth">
+        <a
+          routerLink="/designs"
+          class="nav-link"
+          [class.active]="isActiveRoute('/designs')"
+        >
+          <mat-icon class="nav-icon">collections</mat-icon>
+          <span>My Designs</span>
+        </a>
       </li>
-      <li *ngIf="!isAuth">
-        <a routerLink="/signup">Signup</a>
+
+      <!-- Auth Section -->
+      <li class="nav-item auth-section" *ngIf="!isAuth">
+        <a
+          routerLink="/signup"
+          class="nav-link signup-btn"
+          [class.active]="isActiveRoute('/signup')"
+        >
+          Sign Up
+        </a>
       </li>
-      <li *ngIf="!isAuth">
-        <a routerLink="/login">Login</a>
+
+      <li class="nav-item" *ngIf="!isAuth">
+        <a
+          routerLink="/login"
+          class="nav-link login-btn"
+          [class.active]="isActiveRoute('/login')"
+        >
+          Log In
+        </a>
       </li>
-      <li *ngIf="isAuth">
-        <a (click)="onLogout()">Logout</a>
+
+      <li class="nav-item user-section" *ngIf="isAuth">
+        <button
+          mat-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-trigger"
+        >
+          <mat-icon>account_circle</mat-icon>
+          <span>Account</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu" class="user-menu">
+          <button mat-menu-item routerLink="/designs">
+            <mat-icon>collections</mat-icon>
+            <span>My Designs</span>
+          </button>
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="onLogout()" class="logout-item">
+            <mat-icon>exit_to_app</mat-icon>
+            <span>Log Out</span>
+          </button>
+        </mat-menu>
       </li>
     </ul>
+  </nav>
+
+  <!-- Mobile Menu Button -->
+  <div class="mobile-menu-section" fxHide fxShow.xs>
+    <button
+      mat-icon-button
+      (click)="toggleMobileMenu()"
+      class="mobile-menu-button"
+    >
+      <mat-icon>{{ isMobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+    </button>
   </div>
 </mat-toolbar>
+
+<!-- Mobile Navigation Overlay -->
+<div
+  class="mobile-nav-overlay"
+  [class.open]="isMobileMenuOpen"
+  fxHide
+  fxShow.xs
+>
+  <nav class="mobile-nav">
+    <ul class="mobile-nav-list">
+      <li class="mobile-nav-item">
+        <a
+          routerLink="/"
+          class="mobile-nav-link"
+          [class.active]="isActiveRoute('/')"
+        >
+          <mat-icon>build</mat-icon>
+          <span>Constructor</span>
+        </a>
+      </li>
+
+      <li class="mobile-nav-item" *ngIf="isAuth">
+        <a
+          routerLink="/designs"
+          class="mobile-nav-link"
+          [class.active]="isActiveRoute('/designs')"
+        >
+          <mat-icon>collections</mat-icon>
+          <span>My Designs</span>
+        </a>
+      </li>
+
+      <li class="mobile-nav-divider" *ngIf="!isAuth"></li>
+
+      <li class="mobile-nav-item" *ngIf="!isAuth">
+        <a
+          routerLink="/signup"
+          class="mobile-nav-link"
+          [class.active]="isActiveRoute('/signup')"
+        >
+          <mat-icon>person_add</mat-icon>
+          <span>Sign Up</span>
+        </a>
+      </li>
+
+      <li class="mobile-nav-item" *ngIf="!isAuth">
+        <a
+          routerLink="/login"
+          class="mobile-nav-link"
+          [class.active]="isActiveRoute('/login')"
+        >
+          <mat-icon>login</mat-icon>
+          <span>Log In</span>
+        </a>
+      </li>
+
+      <li class="mobile-nav-divider" *ngIf="isAuth"></li>
+
+      <li class="mobile-nav-item logout-item" *ngIf="isAuth">
+        <button class="mobile-nav-link logout-button" (click)="onLogout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Log Out</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

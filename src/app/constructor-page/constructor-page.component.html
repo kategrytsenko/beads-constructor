@@ -1,130 +1,200 @@
-<!-- src/app/constructor-page/constructor-page.component.html -->
-
-<div class="constructor-page-container">
-  <!-- Loading indicator for design loading -->
+<div class="constructor-page">
+  <!-- Loading overlay -->
   <div *ngIf="isLoadingDesign" class="loading-overlay">
     <mat-spinner diameter="50"></mat-spinner>
     <p>Loading design...</p>
   </div>
 
-  <!-- Main content -->
-  <div class="constructor-painting-panel">
-    <app-painting-panel
-      [savedColors]="savedColors"
-      (onSelectSavedColor)="selectColor($event)"
-      (onColorDelete)="deleteColor($event)"
-      (onSaveColor)="saveColor()"
-      (onSetWhite)="setWhite()"
-      [selectedColor]="selectedColor"
-      (colorChanged)="selectedColor = $event">
-    </app-painting-panel>
-  </div>
-
-  <div class="constructor-main-container">
-    <!-- Design header with actions -->
-    <div class="design-header">
-      <div class="design-info">
-        <h2 class="design-title">
-          {{ currentDesignId ? 'Edit Design' : 'New Design' }}
-          <span *ngIf="hasUnsavedChanges" class="unsaved-indicator">*</span>
-        </h2>
-      </div>
-
-      <div class="design-actions">
-        <button 
-          mat-button
-          (click)="onCreateNew()"
-          class="action-btn">
-          <mat-icon>add</mat-icon>
-          New
-        </button>
-
-        <button 
-          mat-button
-          (click)="onViewSavedDesigns()"
-          class="action-btn">
-          <mat-icon>collections</mat-icon>
-          My Designs
-        </button>
-      </div>
+  <!-- Page header with breadcrumb -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <mat-icon>palette</mat-icon>
+      <span class="separator">/</span>
+      <span class="current">
+        {{ currentDesignId ? 'Edit Design' : 'New Design' }}
+      </span>
+      <span *ngIf="hasUnsavedChanges" class="unsaved-indicator">*</span>
     </div>
 
-    <!-- Canvas dimensions controls -->
-    <div class="dimensions-controls">
-      <div class="dimensions-controls-column">
-        <div class="control-title">Beads per Row:</div>
-        <div>
-          <input
-            type="number"
-            class="controls-container-input"
-            [(ngModel)]="rawBeadsAmount"
-            min="1"
-            max="100" />
-        </div>
-      </div>
-
-      <div class="dimensions-controls-column">
-        <div class="control-title">Number of Rows:</div>
-        <div>
-          <input
-            type="number"
-            class="controls-container-input"
-            [(ngModel)]="columnBeadsAmount"
-            min="1"
-            max="100" />
-        </div>
-      </div>
-
-      <button 
-        (click)="setNewDimensions()" 
-        mat-raised-button 
-        color="primary"
-        class="apply-dimensions-btn">
-        Apply Dimensions
+    <div class="header-actions">
+      <button mat-button (click)="onCreateNew()" class="action-btn">
+        <mat-icon>add</mat-icon>
+        New
+      </button>
+      <button mat-button (click)="onViewSavedDesigns()" class="action-btn">
+        <mat-icon>collections</mat-icon>
+        My Designs
       </button>
     </div>
+  </div>
 
-    <!-- Canvas container -->
-    <div class="beads-canvas-container">
-      <app-beads-constructor
-        [selectedColor]="selectedColor"
-        [beadsColumnArray]="constructorConfig.beadsColumnArray"
-        [beadsRawArray]="constructorConfig.beadsRawArray"
-        [canvasArray]="constructorConfig.canvasArray"
-        (colorChanged)="onColorChanged($event)">
-      </app-beads-constructor>
-    </div>
+  <!-- Main layout with sidebar and canvas -->
+  <div class="constructor-layout">
+    <!-- Left Sidebar - Tools -->
+    <div class="sidebar sidebar-left">
+      <div class="sidebar-section">
+        <h3 class="section-title">
+          <mat-icon>palette</mat-icon>
+          Colors
+        </h3>
 
-    <!-- Bottom actions -->
-    <div class="bottom-actions">
-      <div class="left-actions">
-        <button 
-          (click)="clearAllCanvas()" 
-          mat-raised-button 
-          color="warn"
-          class="clear-btn">
-          <mat-icon>clear</mat-icon>
-          Clear Canvas
-        </button>
+        <app-painting-panel
+          [savedColors]="savedColors"
+          (onSelectSavedColor)="selectColor($event)"
+          (onColorDelete)="deleteColor($event)"
+          (onSaveColor)="saveColor()"
+          (onSetWhite)="setWhite()"
+          [selectedColor]="selectedColor"
+          (colorChanged)="selectedColor = $event"
+        ></app-painting-panel>
       </div>
 
-      <div class="right-actions">
-        <button 
-          (click)="onDesignSave()" 
-          mat-raised-button 
-          color="primary"
-          [disabled]="isSaving"
-          class="save-btn">
-          <mat-icon *ngIf="isSaving">hourglass_empty</mat-icon>
-          <mat-icon *ngIf="!isSaving">save</mat-icon>
-          <span *ngIf="!isSaving">
-            {{ currentDesignId ? 'Update Design' : 'Save Design' }}
+      <!-- Canvas Settings -->
+      <div class="sidebar-section">
+        <h3 class="section-title">
+          <mat-icon>grid_on</mat-icon>
+          Canvas Size
+        </h3>
+
+        <div class="size-controls">
+          <mat-form-field appearance="outline" class="size-field">
+            <mat-label>Rows</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="columnBeadsAmount"
+              min="1"
+              max="100"
+              class="size-input"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="size-field">
+            <mat-label>Columns</mat-label>
+            <input
+              matInput
+              type="number"
+              [(ngModel)]="rawBeadsAmount"
+              min="1"
+              max="100"
+              class="size-input"
+            />
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="setNewDimensions()"
+            class="apply-size-btn"
+          >
+            <mat-icon>check</mat-icon>
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Canvas Area -->
+    <div class="canvas-area">
+      <!-- Canvas toolbar -->
+      <div class="canvas-toolbar">
+        <div class="toolbar-left">
+          <span class="canvas-info">
+            {{ columnBeadsAmount }} × {{ rawBeadsAmount }} beads
           </span>
-          <span *ngIf="isSaving">
-            {{ currentDesignId ? 'Updating...' : 'Saving...' }}
-          </span>
-        </button>
+        </div>
+
+        <div class="toolbar-right">
+          <button mat-icon-button matTooltip="Zoom In" class="zoom-btn">
+            <mat-icon>zoom_in</mat-icon>
+          </button>
+
+          <button mat-icon-button matTooltip="Zoom Out" class="zoom-btn">
+            <mat-icon>zoom_out</mat-icon>
+          </button>
+
+          <button mat-icon-button matTooltip="Fit to Screen" class="zoom-btn">
+            <mat-icon>fit_screen</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- The actual canvas -->
+      <div class="canvas-container">
+        <div class="canvas-wrapper">
+          <app-beads-constructor
+            [selectedColor]="selectedColor"
+            [beadsColumnArray]="constructorConfig.beadsColumnArray"
+            [beadsRawArray]="constructorConfig.beadsRawArray"
+            [canvasArray]="constructorConfig.canvasArray"
+            (colorChanged)="onColorChanged($event)"
+          ></app-beads-constructor>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar - Actions (mobile: bottom panel) -->
+    <div class="sidebar sidebar-right">
+      <!-- Quick Actions -->
+      <div class="sidebar-section">
+        <h3 class="section-title">
+          <mat-icon>build</mat-icon>
+          Tools
+        </h3>
+
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            color="warn"
+            (click)="clearAllCanvas()"
+            class="clear-btn"
+          >
+            <mat-icon>clear_all</mat-icon>
+            Clear All
+          </button>
+
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="onDesignSave()"
+            [disabled]="isSaving"
+            class="save-btn"
+          >
+            <mat-icon *ngIf="isSaving" class="spinning">
+              hourglass_empty
+            </mat-icon>
+            <mat-icon *ngIf="!isSaving">save</mat-icon>
+            <span>{{ currentDesignId ? 'Update' : 'Save' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pattern Library (future feature) -->
+      <div class="sidebar-section">
+        <h3 class="section-title">
+          <mat-icon>auto_awesome</mat-icon>
+          Patterns
+        </h3>
+
+        <div class="patterns-placeholder">
+          <mat-icon class="placeholder-icon">construction</mat-icon>
+          <p>Pattern library coming soon!</p>
+        </div>
       </div>
     </div>
   </div>
+</div>
+
+<!-- Mobile floating action button -->
+<div class="fab-container" fxHide fxShow.xs>
+  <button
+    mat-fab
+    color="primary"
+    (click)="onDesignSave()"
+    [disabled]="isSaving"
+    class="save-fab"
+  >
+    <mat-icon *ngIf="isSaving" class="spinning">hourglass_empty</mat-icon>
+    <mat-icon *ngIf="!isSaving">save</mat-icon>
+  </button>
 </div>
