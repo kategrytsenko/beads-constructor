@@ -1,50 +1,202 @@
-.constructor-page-container {
-  display: flex;
-  flex-direction: row;
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
-}
-
-.constructor-painting-panel {
-  position: sticky;
-  top: 64px;
-  height: 100vh;
-  width: 150px;
-  app-painting-panel {
-    position: relative;
-  }
-}
-
-.constructor-main-container {
-  padding: 15px;
-}
-
-.beads-canvas__container {
+  background: rgba(255, 255, 255, 0.8);
   display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+  flex-direction: column;
   align-items: center;
-}
-
-.controls-container {
-  display: flex;
-  padding: 15px;
-  &__input {
-    width: 50px;
+  justify-content: center;
+  z-index: 1000;
+  
+  p {
+    margin-top: 16px;
+    color: #666;
+    font-size: 16px;
   }
 }
 
-.dimensions__controls {
+// Design header
+.design-header {
   display: flex;
-  flex-direction: row;
-  margin-bottom: 10px;
-  &-column {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .design-info {
+    .design-title {
+      margin: 0;
+      color: #333;
+      font-size: 20px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      
+      .unsaved-indicator {
+        color: #ff9800;
+        font-weight: bold;
+        font-size: 24px;
+      }
+    }
+  }
+  
+  .design-actions {
+    display: flex;
+    gap: 8px;
+    
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: auto;
+    }
+  }
+}
+
+// Updated dimensions controls
+.dimensions-controls {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  
+  .dimensions-controls-column {
+    flex: 1;
+    
+    .control-title {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+      font-size: 14px;
+    }
+    
+    .controls-container-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      
+      &:focus {
+        outline: none;
+        border-color: #2196f3;
+        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+      }
+    }
+  }
+  
+  .apply-dimensions-btn {
+    flex-shrink: 0;
+    height: 40px;
+  }
+}
+
+// Canvas container
+.beads-canvas-container {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+// Bottom actions
+.bottom-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .left-actions,
+  .right-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .clear-btn {
     display: flex;
     align-items: center;
-    margin-right: 10px;
+    gap: 6px;
+  }
+  
+  .save-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 140px;
+    
+    mat-icon {
+      &.loading-icon {
+        animation: rotate 2s linear infinite;
+      }
+    }
+    
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   }
 }
 
-.beads-raw {
-  display: flex;
-  justify-content: center;
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .design-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    
+    .design-actions {
+      justify-content: center;
+    }
+  }
+  
+  .dimensions-controls {
+    flex-direction: column;
+    gap: 16px;
+    
+    .apply-dimensions-btn {
+      width: 100%;
+    }
+  }
+  
+  .bottom-actions {
+    flex-direction: column;
+    gap: 16px;
+    
+    .left-actions,
+    .right-actions {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .clear-btn,
+    .save-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 }

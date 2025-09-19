@@ -1,0 +1,352 @@
+.saved-designs-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 32px;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      color: #333;
+      font-size: 28px;
+      font-weight: 500;
+      
+      .title-icon {
+        color: #2196f3;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+    }
+    
+    .create-new-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      font-weight: 500;
+    }
+  }
+}
+
+.designs-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  
+  .loading-text {
+    margin-top: 16px;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// Auth Required State
+.auth-required {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  
+  .auth-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ff9800;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    margin: 16px 0 8px 0;
+    color: #333;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  
+  p {
+    margin: 0 0 24px 0;
+    color: #666;
+    font-size: 16px;
+    max-width: 400px;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #9c27b0;
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    margin: 16px 0 8px 0;
+    color: #333;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  
+  p {
+    margin: 0 0 24px 0;
+    color: #666;
+    font-size: 16px;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+  
+  .create-first-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+  }
+}
+
+// Designs Grid
+.designs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 0;
+}
+
+.design-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+  
+  .design-preview {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    cursor: pointer;
+    
+    .preview-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    
+    .preview-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: white;
+      
+      .edit-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        margin-bottom: 4px;
+      }
+      
+      .edit-text {
+        font-size: 14px;
+        font-weight: 500;
+      }
+    }
+    
+    &:hover {
+      .preview-image {
+        transform: scale(1.05);
+      }
+      
+      .preview-overlay {
+        opacity: 1;
+      }
+    }
+  }
+  
+  .design-info {
+    padding: 16px;
+    
+    .design-name {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .design-description {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .design-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #999;
+      
+      .dimensions {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 500;
+      }
+      
+      .date {
+        font-style: italic;
+      }
+    }
+  }
+  
+  .design-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px 16px;
+    border-top: 1px solid #f0f0f0;
+    
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+      
+      &.edit-btn:hover {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+      
+      &.duplicate-btn:hover {
+        background-color: #f3e5f5;
+        color: #7b1fa2;
+      }
+      
+      &.share-btn:hover {
+        background-color: #e8f5e8;
+        color: #388e3c;
+      }
+      
+      &.delete-btn:hover {
+        background-color: #ffebee;
+        color: #d32f2f;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .saved-designs-container {
+    padding: 12px;
+  }
+  
+  .page-header {
+    margin-bottom: 24px;
+    
+    .header-content {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+      
+      .page-title {
+        font-size: 24px;
+        text-align: center;
+      }
+      
+      .create-new-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+  
+  .designs-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .design-card {
+    .design-actions {
+      justify-content: center;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .designs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .design-card {
+    .design-info {
+      padding: 12px;
+      
+      .design-name {
+        font-size: 16px;
+      }
+      
+      .design-description {
+        font-size: 13px;
+      }
+    }
+  }
+}

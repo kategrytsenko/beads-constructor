@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { Observable, from, map, catchError, of } from 'rxjs';
+import { Observable, from, map, catchError, of, switchMap } from 'rxjs';
 import {
   BeadDesign,
   CreateDesignRequest,
@@ -19,31 +19,31 @@ export class DesignService {
   private readonly COLLECTION_NAME = 'beadDesigns';
 
   getUserDesigns(): Observable<BeadDesign[]> {
-    const userId = this.getCurrentUserId();
-    if (!userId) {
-      this.showError(DESIGN_MESSAGES.userNotAuthenticated);
-      return of([]);
-    }
+  return from(this.getCurrentUserId()).pipe(
+    switchMap(userId => {
+      if (!userId) {
+        this.showError('User not authenticated');
+        return of([]);
+      }
 
-    return this.firestore
-      .collection<BeadDesign>(this.COLLECTION_NAME, (ref) =>
-        ref.where('userId', '==', userId).orderBy('updatedAt', 'desc')
-      )
-      .snapshotChanges()
-      .pipe(
-        map((actions) =>
-          actions.map((a) => {
-            const data = a.payload.doc.data();
-            const id = a.payload.doc.id;
-            return { ...data, id } as BeadDesign;
-          })
-        ),
-        catchError((error) => {
-          console.error('Error getting user designs:', error);
-          this.showError(DESIGN_MESSAGES.designsLoadError);
-          return of([]);
-        })
-      );
+      return this.firestore
+        .collection<BeadDesign>(this.COLLECTION_NAME, ref => 
+          ref.where('userId', '==', userId)
+             .orderBy('updatedAt', 'desc')
+        )
+        .snapshotChanges();
+    }),
+    map(actions => actions.map(a => {
+      const data = a.payload.doc.data();
+      const id = a.payload.doc.id;
+      return { ...data, id } as BeadDesign;
+    })),
+    catchError(error => {
+      console.error('Error getting user designs:', error);
+      this.showError(DESIGN_MESSAGES.designsLoadError);
+      return of([]);
+    })
+  );
   }
 
   // Створити новий дизайн
@@ -191,9 +191,14 @@ export class DesignService {
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+Cjwvc3ZnPgo=';
   }
 
-  private getCurrentUserId(): string | null {
-    const user = this.authService.getUserOnce();
-    return user ? (user as any).uid : null;
+  private async getCurrentUserId(): Promise<string | null> {
+    try {
+      const user = await this.authService.getUserOnce();
+      return user ? (user as any).uid : null;
+    } catch (error) {
+      console.error('Error getting current user:', error);
+      return null;
+    }
   }
 
   private showSuccess(message: string): void {

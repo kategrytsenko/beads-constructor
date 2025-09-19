@@ -1,4 +1,13 @@
+<!-- src/app/constructor-page/constructor-page.component.html -->
+
 <div class="constructor-page-container">
+  <!-- Loading indicator for design loading -->
+  <div *ngIf="isLoadingDesign" class="loading-overlay">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading design...</p>
+  </div>
+
+  <!-- Main content -->
   <div class="constructor-painting-panel">
     <app-painting-panel
       [savedColors]="savedColors"
@@ -7,60 +16,115 @@
       (onSaveColor)="saveColor()"
       (onSetWhite)="setWhite()"
       [selectedColor]="selectedColor"
-      (colorChanged)="selectedColor = $event"
-    ></app-painting-panel>
+      (colorChanged)="selectedColor = $event">
+    </app-painting-panel>
   </div>
 
   <div class="constructor-main-container">
-    <div class="dimensions__controls">
-      <div class="dimensions__controls-column">
-        <div class="control-title">Number of beads in the raw:</div>
+    <!-- Design header with actions -->
+    <div class="design-header">
+      <div class="design-info">
+        <h2 class="design-title">
+          {{ currentDesignId ? 'Edit Design' : 'New Design' }}
+          <span *ngIf="hasUnsavedChanges" class="unsaved-indicator">*</span>
+        </h2>
+      </div>
+
+      <div class="design-actions">
+        <button 
+          mat-button
+          (click)="onCreateNew()"
+          class="action-btn">
+          <mat-icon>add</mat-icon>
+          New
+        </button>
+
+        <button 
+          mat-button
+          (click)="onViewSavedDesigns()"
+          class="action-btn">
+          <mat-icon>collections</mat-icon>
+          My Designs
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas dimensions controls -->
+    <div class="dimensions-controls">
+      <div class="dimensions-controls-column">
+        <div class="control-title">Beads per Row:</div>
         <div>
           <input
             type="number"
-            class="controls-container__input"
+            class="controls-container-input"
             [(ngModel)]="rawBeadsAmount"
-            max="100"
-          />
+            min="1"
+            max="100" />
         </div>
       </div>
-      <div class="dimensions__controls-column">
-        <div class="control-title">Number of beads in the column:</div>
+
+      <div class="dimensions-controls-column">
+        <div class="control-title">Number of Rows:</div>
         <div>
           <input
             type="number"
-            class="controls-container__input"
+            class="controls-container-input"
             [(ngModel)]="columnBeadsAmount"
-            max="100"
-          />
+            min="1"
+            max="100" />
         </div>
       </div>
-      <!--      TODO: popup to prevent accidental deletion of already created design -->
-      <button (click)="setNewDimensions()" mat-raised-button color="primary">
-        Change the canvas size
+
+      <button 
+        (click)="setNewDimensions()" 
+        mat-raised-button 
+        color="primary"
+        class="apply-dimensions-btn">
+        Apply Dimensions
       </button>
     </div>
 
-    <div class="row beads-canvas__container">
-      <div class="">
-        <app-beads-constructor
-          [selectedColor]="selectedColor"
-          [beadsColumnArray]="constructorConfig.beadsColumnArray"
-          [beadsRawArray]="constructorConfig.beadsRawArray"
-          [canvasArray]="constructorConfig.canvasArray"
-          (colorChanged)="onColorChanged($event)"
-        ></app-beads-constructor>
+    <!-- Canvas container -->
+    <div class="beads-canvas-container">
+      <app-beads-constructor
+        [selectedColor]="selectedColor"
+        [beadsColumnArray]="constructorConfig.beadsColumnArray"
+        [beadsRawArray]="constructorConfig.beadsRawArray"
+        [canvasArray]="constructorConfig.canvasArray"
+        (colorChanged)="onColorChanged($event)">
+      </app-beads-constructor>
+    </div>
+
+    <!-- Bottom actions -->
+    <div class="bottom-actions">
+      <div class="left-actions">
+        <button 
+          (click)="clearAllCanvas()" 
+          mat-raised-button 
+          color="warn"
+          class="clear-btn">
+          <mat-icon>clear</mat-icon>
+          Clear Canvas
+        </button>
       </div>
-    </div>
 
-    <div>
-      <button (click)="clearAllCanvas()" mat-raised-button color="danger">
-        Clear all canvas
-      </button>
-
-      <button (click)="onDesignSave()" mat-raised-button color="primary">
-        Save this design
-      </button>
+      <div class="right-actions">
+        <button 
+          (click)="onDesignSave()" 
+          mat-raised-button 
+          color="primary"
+          [disabled]="isSaving"
+          class="save-btn">
+          <mat-icon *ngIf="isSaving">hourglass_empty</mat-icon>
+          <mat-icon *ngIf="!isSaving">save</mat-icon>
+          <span *ngIf="!isSaving">
+            {{ currentDesignId ? 'Update Design' : 'Save Design' }}
+          </span>
+          <span *ngIf="isSaving">
+            {{ currentDesignId ? 'Updating...' : 'Saving...' }}
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
