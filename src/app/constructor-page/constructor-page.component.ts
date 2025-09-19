@@ -5,7 +5,8 @@ import {
 } from '../models/constructor-models';
 import { AuthService } from '../core/auth/auth.service';
 import { DesignService } from '../services/design.service';
-import { Subscription } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { MotivateLoginPopupComponent } from './components/motivate-login-popup/motivate-login-popup.component';
 import { SaveDesignDialogComponent, SaveDesignDialogData, SaveDesignDialogResult } from './components/save-design-dialog/save-design-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -30,7 +31,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
   
-  // Стан збереження
+  // State for saving functionality
   currentDesignId: string | null = null;
   isLoadingDesign = false;
   isSaving = false;
@@ -56,7 +57,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     
     this.constructorConfig = this.constructorService.getConstructorConfig();
     
-    // Перевіряємо, чи потрібно завантажити існуючий дизайн
+    // Check if we need to load an existing design
     this.checkForDesignId();
   }
 
@@ -77,13 +78,13 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           this.rawBeadsAmount = design.dimensions.rows;
           this.columnBeadsAmount = design.dimensions.columns;
           
-          // ФІКС: Спочатку створюємо новий canvas з правильними розмірами
+          // First create new canvas with correct dimensions
           this.constructorConfig = this.constructorService.resetConstructorConfig(
             this.rawBeadsAmount,
             this.columnBeadsAmount
           );
           
-          // ФІКС: Потім застосовуємо збережені дані до кожної комірки
+          // Then apply saved data to each cell
           this.applyDesignDataToCanvas(design.canvasData);
           this.hasUnsavedChanges = false;
           
@@ -103,7 +104,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   private applyDesignDataToCanvas(savedCanvasData: PaintBlockModel[][]): void {
-    // Перевіряємо, чи розміри збереженого дизайну відповідають поточному canvas
+    // Check if saved design dimensions match current canvas
     if (!savedCanvasData || savedCanvasData.length === 0) {
       return;
     }
@@ -115,17 +116,17 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
     console.log(`Applying design: saved ${savedRows}x${savedCols}, current ${currentRows}x${currentCols}`);
 
-    // Застосовуємо збережені кольори до поточного canvas
+    // Apply saved colors to current canvas
     for (let row = 0; row < Math.min(savedRows, currentRows); row++) {
       for (let col = 0; col < Math.min(savedCols, currentCols); col++) {
         if (savedCanvasData[row] && savedCanvasData[row][col]) {
-          // Використовуємо конструктор сервіс для правильного оновлення
+          // Use constructor service for proper updating
           const paintBlock: PaintBlockModel = {
             ...this.constructorConfig.canvasArray[row][col],
             color: savedCanvasData[row][col].color
           };
           
-          // Застосовуємо зміну через сервіс
+          // Apply change through service
           this.constructorConfig.canvasArray = this.constructorService.onColorChanged(
             paintBlock,
             savedCanvasData[row][col].color
@@ -159,10 +160,10 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     if (hasContent) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
-          title: 'Очистити canvas?',
-          message: 'Ви впевнені, що хочете очистити весь canvas? Цю дію неможливо скасувати.',
-          confirmText: 'Очистити',
-          cancelText: 'Скасувати'
+          title: 'Clear Canvas?',
+          message: 'Are you sure you want to clear the entire canvas? This action cannot be undone.',
+          confirmText: 'Clear',
+          cancelText: 'Cancel'
         }
       });
 
@@ -189,10 +190,10 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     if (hasContent) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
-          title: 'Змінити розмір canvas?',
-          message: 'Зміна розміру canvas призведе до втрати поточного дизайну. Продовжити?',
-          confirmText: 'Змінити',
-          cancelText: 'Скасувати'
+          title: 'Change Canvas Size?',
+          message: 'Changing the canvas size will result in losing the current design. Continue?',
+          confirmText: 'Change',
+          cancelText: 'Cancel'
         }
       });
 
@@ -212,7 +213,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       this.rawBeadsAmount,
       this.columnBeadsAmount
     );
-    this.currentDesignId = null; // Новий canvas = новий дизайн
+    this.currentDesignId = null; // New canvas = new design
     this.hasUnsavedChanges = false;
   }
 
@@ -230,14 +231,25 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const dialogData: SaveDesignDialogData = {
-      mode: this.currentDesignId ? 'update' : 'create'
-    };
-
-    // Якщо оновлюємо існуючий дизайн, завантажимо поточні дані
+    // If updating existing design, load current data
+    let currentDesignData: BeadDesign | null = null;
     if (this.currentDesignId) {
-      // Тут можна додати завантаження існуючих назви та опису
+      try {
+        // Get current design from database using firstValueFrom
+        currentDesignData = await firstValueFrom(
+          this.designService.getDesignById(this.currentDesignId).pipe(take(1))
+        );
+      } catch (error) {
+        console.error('Error loading current design data:', error);
+        currentDesignData = null;
+      }
     }
+
+    const dialogData: SaveDesignDialogData = {
+      mode: this.currentDesignId ? 'update' : 'create',
+      existingName: currentDesignData?.name || '',
+      existingDescription: currentDesignData?.description || ''
+    };
 
     const dialogRef = this.dialog.open(SaveDesignDialogComponent, {
       data: dialogData,
@@ -267,7 +279,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       };
 
       if (this.currentDesignId) {
-        // Оновлення існуючого дизайну
+        // Update existing design
         const success = await this.designService.updateDesign({
           id: this.currentDesignId,
           ...designData
@@ -277,14 +289,14 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           this.hasUnsavedChanges = false;
         }
       } else {
-        // Створення нового дизайну
+        // Create new design
         const newDesignId = await this.designService.createDesign(designData);
         
         if (newDesignId) {
           this.currentDesignId = newDesignId;
           this.hasUnsavedChanges = false;
           
-          // Оновлюємо URL з новим ID
+          // Update URL with new ID
           this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { designId: newDesignId },
@@ -303,14 +315,14 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     if (this.hasUnsavedChanges) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
-          title: 'Незбережені зміни',
-          message: 'У вас є незбережені зміни. Ви впевнені, що хочете створити новий дизайн?',
-          confirmText: 'Створити новий',
-          cancelText: 'Скасувати'
+          title: 'Unsaved Changes',
+          message: 'You have unsaved changes. Are you sure you want to create a new design?',
+          confirmText: 'Create New',
+          cancelText: 'Cancel'
         }
       });
 
-      const confirmed = await dialogRef.afterClosed().toPromise();
+      const confirmed = await firstValueFrom(dialogRef.afterClosed());
       if (!confirmed) return;
     }
 
@@ -318,9 +330,9 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     this.constructorConfig.canvasArray = this.constructorService.clearAllCanvas();
     this.hasUnsavedChanges = false;
     
-    // Очищуємо URL
+    // Clear URL parameters
     this.router.navigate(['/'], { queryParams: {} });
-    this.showSuccess('Створено новий дизайн');
+    this.showSuccess('Created new design');
   }
 
   onViewSavedDesigns(): void {
@@ -328,14 +340,14 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Закрити', {
+    this.snackBar.open(message, 'Close', {
       duration: 3000,
       panelClass: ['success-snackbar']
     });
   }
 
   private showError(message: string): void {
-    this.snackBar.open(message, 'Закрити', {
+    this.snackBar.open(message, 'Close', {
       duration: 5000,
       panelClass: ['error-snackbar']
     });
