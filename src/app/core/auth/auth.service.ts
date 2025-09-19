@@ -1,51 +1,72 @@
-import { User } from './user.model';
 import { AuthData } from './auth-data.model';
-import { Injectable, OnInit } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Injectable()
 export class AuthService {
+  private afAuth = inject(AngularFireAuth);
+  private router = inject(Router);
+
   authChange$$ = new BehaviorSubject<boolean>(false);
-  private user!: User | null;
+  user$ = this.afAuth.authState;
 
-  constructor(private router: Router) {}
+  constructor() {
+    this.afAuth.authState.subscribe((u) => this.authChange$$.next(!!u));
 
-  registerUser(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString(), //TODO: backend
-    };
-
-    this.authSuccessfully();
+    this.afAuth.setPersistence('local');
   }
 
-  login(authData: AuthData) {
-    this.user = {
-      email: authData.email,
-      userId: Math.round(Math.random() * 10000).toString(), //TODO: backend
-    };
 
-    this.authSuccessfully();
+  async registerUser(authData: AuthData) {
+    try {
+      await this.afAuth.createUserWithEmailAndPassword(authData.email, authData.password);
+      // TODO: optional: (await this.afAuth.currentUser)?.sendEmailVerification();
+      this.authSuccessfully();
+    } catch (e) {
+      this.handleAuthError(e);
+    }
   }
 
-  logout() {
-    this.user = null;
+  async login(authData: AuthData) {
+    try {
+      await this.afAuth.signInWithEmailAndPassword(authData.email, authData.password);
+      this.authSuccessfully();
+    } catch (e) {
+      this.handleAuthError(e);
+    }
+  }
 
+  async logout() {
+    await this.afAuth.signOut();
     this.authChange$$.next(false);
     this.router.navigate(['/login']);
   }
 
-  getUser() {
-    return { ...this.user };
+  async getUserOnce() {
+    return await firstValueFrom(this.user$); // Firebase user || null
   }
 
   isAuth() {
-    return this.user != null;
+    return this.authChange$$.value;
   }
 
   private authSuccessfully() {
     this.authChange$$.next(true);
     this.router.navigate(['/designs']);
+  }
+
+  private handleAuthError(e: any) {
+    // TODO: add custom UI (snackbar / alert)
+    const code = e?.code as string;
+    const map: Record<string, string> = {
+      'auth/email-already-in-use': 'E-mail вже використовується',
+      'auth/invalid-email': 'Некоректний e-mail',
+      'auth/weak-password': 'Надто слабкий пароль (мін. 6 символів)',
+      'auth/user-not-found': 'Користувача не знайдено',
+      'auth/wrong-password': 'Невірний пароль',
+    };
+    alert(map[code] ?? 'Помилка авторизації');
   }
 }
