@@ -54,9 +54,91 @@
         <h3 class="section-title">
           <mat-icon>grid_on</mat-icon>
           Canvas Size
+          <button
+            mat-icon-button
+            (click)="toggleLimitsInfo()"
+            matTooltip="Size limits info"
+            class="info-btn"
+          >
+            <mat-icon>info</mat-icon>
+          </button>
         </h3>
 
+        <!-- Limits info panel -->
+        <div *ngIf="showLimitsInfo" class="limits-info">
+          <div class="limits-card">
+            <h4>Size Limits</h4>
+            <ul class="limits-list">
+              <li>
+                Rows: {{ canvasLimits.minRows }}-{{ canvasLimits.maxRows }}
+              </li>
+              <li>
+                Columns: {{ canvasLimits.minColumns }}-{{
+                  canvasLimits.maxColumns
+                }}
+              </li>
+              <li>Max cells: {{ canvasLimits.maxTotalCells }}</li>
+            </ul>
+            <p class="upgrade-hint">Upgrade to Premium for larger canvases!</p>
+          </div>
+        </div>
+
+        <!-- Quick size presets -->
+        <div class="size-presets">
+          <h4>Quick Sizes</h4>
+          <div class="preset-buttons">
+            <button
+              *ngFor="let size of recommendedSizes"
+              mat-stroked-button
+              (click)="setRecommendedSize(size.rows, size.columns)"
+              class="preset-btn"
+            >
+              {{ size.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom size controls -->
         <div class="size-controls">
+          <h4>Custom Size</h4>
+
+          <div class="size-input-row">
+            <mat-form-field appearance="outline" class="size-field">
+              <mat-label>Rows</mat-label>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="columnBeadsAmount"
+                (ngModelChange)="onCanvasSizeChange()"
+                [min]="canvasLimits.minRows"
+                [max]="canvasLimits.maxRows"
+                class="size-input"
+              />
+              <mat-hint>
+                {{ canvasLimits.minRows }}-{{ canvasLimits.maxRows }}
+              </mat-hint>
+            </mat-form-field>
+
+            <span class="size-separator">×</span>
+
+            <mat-form-field appearance="outline" class="size-field">
+              <mat-label>Columns</mat-label>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="rawBeadsAmount"
+                (ngModelChange)="onCanvasSizeChange()"
+                [min]="canvasLimits.minColumns"
+                [max]="canvasLimits.maxColumns"
+                class="size-input"
+              />
+              <mat-hint>
+                {{ canvasLimits.minColumns }}-{{ canvasLimits.maxColumns }}
+              </mat-hint>
+            </mat-form-field>
+          </div>
+
+          <!-- <div class="size-controls">
           <mat-form-field appearance="outline" class="size-field">
             <mat-label>Rows</mat-label>
             <input
@@ -90,6 +172,72 @@
             <mat-icon>check</mat-icon>
             Apply
           </button>
+        </div> -->
+
+          <div class="canvas-info">
+            <div class="info-item">
+              <span class="info-label">Total beads:</span>
+              <span class="info-value">
+                {{ columnBeadsAmount * rawBeadsAmount }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Aspect ratio:</span>
+              <span class="info-value">
+                {{ (rawBeadsAmount / columnBeadsAmount).toFixed(2) }}:1
+              </span>
+            </div>
+          </div>
+
+          <!-- Validation messages -->
+          <div *ngIf="validationErrors.length > 0" class="validation-errors">
+            <div *ngFor="let error of validationErrors" class="error-message">
+              <mat-icon>error</mat-icon>
+              {{ error }}
+            </div>
+          </div>
+
+          <div
+            *ngIf="validationWarnings.length > 0"
+            class="validation-warnings"
+          >
+            <div
+              *ngFor="let warning of validationWarnings"
+              class="warning-message"
+            >
+              <mat-icon>warning</mat-icon>
+              {{ warning }}
+            </div>
+          </div>
+
+          <!-- Performance warning -->
+          <div *ngIf="performanceWarning" class="performance-warning">
+            <mat-icon>speed</mat-icon>
+            {{ performanceWarning }}
+          </div>
+
+          <div class="apply-section">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="setNewDimensions()"
+              [disabled]="!canApplyDimensions"
+              class="apply-size-btn"
+            >
+              <mat-icon>check</mat-icon>
+              Apply Size
+            </button>
+
+            <button
+              *ngIf="!canApplyDimensions"
+              mat-stroked-button
+              (click)="constrainCanvasSize()"
+              class="auto-fix-btn"
+            >
+              <mat-icon>auto_fix_high</mat-icon>
+              Auto-fix
+            </button>
+          </div>
         </div>
       </div>
     </div>

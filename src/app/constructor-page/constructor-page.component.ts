@@ -20,6 +20,7 @@ import { ColorsService } from '../services/colors.service';
 import { CreateDesignRequest, BeadDesign } from '../models/design.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
+import { CanvasLimitsService } from '../services/canvas-limits.service';
 
 @Component({
   selector: 'app-constructor-page',
@@ -35,6 +36,11 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
 
+  canvasLimits = this.canvasLimitsService.getLimitsForUser(false); // TODO: передавати isPremium з профілю
+  validationErrors: string[] = [];
+  validationWarnings: string[] = [];
+  showLimitsInfo = false;
+
   // State for saving functionality
   currentDesignId: string | null = null;
   isLoadingDesign = false;
@@ -49,7 +55,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private constructorService: ConstructorService,
     private colorsService: ColorsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private canvasLimitsService: CanvasLimitsService
   ) {}
 
   ngOnInit() {
@@ -63,6 +70,154 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
     // Check if we need to load an existing design
     this.checkForDesignId();
+
+    this.validateCanvasSize();
+  }
+
+  // Валідація розмірів canvas
+  validateCanvasSize(): void {
+    const validation = this.canvasLimitsService.validateCanvasSize(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount,
+      false // TODO: отримувати з профілю користувача
+    );
+
+    this.validationErrors = validation.errors;
+    this.validationWarnings = validation.warnings;
+  }
+
+  // Викликається при зміні розмірів
+  onCanvasSizeChange(): void {
+    this.validateCanvasSize();
+  }
+
+  constrainCanvasSize(): void {
+    const constrained = this.canvasLimitsService.constrainToLimits(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount,
+      false // TODO: isPremium
+    );
+
+    if (constrained.wasConstrained) {
+      this.columnBeadsAmount = constrained.rows;
+      this.rawBeadsAmount = constrained.columns;
+      this.validateCanvasSize();
+      this.showSuccess(
+        `Canvas size adjusted to fit limits: ${constrained.rows}×${constrained.columns}`
+      );
+    }
+  }
+
+  // Оновлений метод зміни розмірів
+  setNewDimensions() {
+    const validation = this.canvasLimitsService.validateCanvasSize(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount,
+      false
+    );
+
+    if (!validation.isValid) {
+      // Показуємо діалог з помилками
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Invalid Canvas Size',
+          message: `Cannot apply these dimensions:\n\n${validation.errors.join(
+            '\n'
+          )}\n\nWould you like to automatically adjust to valid size?`,
+          confirmText: 'Auto-adjust',
+          cancelText: 'Cancel',
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((confirmed) => {
+        if (confirmed) {
+          this.constrainCanvasSize();
+          this.performDimensionChange();
+        }
+      });
+      return;
+    }
+
+    // Показуємо попередження, якщо є
+    if (validation.warnings.length > 0) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Performance Warning',
+          message: `${validation.warnings.join(
+            '\n'
+          )}\n\nDo you want to continue?`,
+          confirmText: 'Continue',
+          cancelText: 'Cancel',
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((confirmed) => {
+        if (confirmed) {
+          this.performDimensionChange();
+        }
+      });
+      return;
+    }
+
+    // Стандартна перевірка контенту
+    const hasContent = this.constructorConfig.canvasArray.some((row) =>
+      row.some((block) => block.color !== '#ffffff')
+    );
+
+    if (hasContent) {
+      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+        data: {
+          title: 'Change Canvas Size?',
+          message:
+            'Changing the canvas size will result in losing the current design. Continue?',
+          confirmText: 'Change',
+          cancelText: 'Cancel',
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((confirmed) => {
+        if (confirmed) {
+          this.performDimensionChange();
+        }
+      });
+    } else {
+      this.performDimensionChange();
+    }
+  }
+
+  // Показати інформацію про ліміти
+  toggleLimitsInfo(): void {
+    this.showLimitsInfo = !this.showLimitsInfo;
+  }
+
+  // Встановити рекомендований розмір
+  setRecommendedSize(rows: number, columns: number): void {
+    this.columnBeadsAmount = rows;
+    this.rawBeadsAmount = columns;
+    this.validateCanvasSize();
+  }
+
+  // Отримати рекомендовані розміри
+  get recommendedSizes() {
+    return this.canvasLimitsService.getRecommendedSizes(false); // TODO: isPremium
+  }
+
+  // Перевірка, чи розміри валідні для кнопки Apply
+  get canApplyDimensions(): boolean {
+    const validation = this.canvasLimitsService.validateCanvasSize(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount,
+      false
+    );
+    return validation.isValid;
+  }
+
+  // Отримати попередження про продуктивність
+  get performanceWarning(): string | null {
+    return this.canvasLimitsService.getPerformanceWarning(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount
+    );
   }
 
   private checkForDesignId(): void {
@@ -192,31 +347,31 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     this.hasUnsavedChanges = true;
   }
 
-  setNewDimensions() {
-    const hasContent = this.constructorConfig.canvasArray.some((row) =>
-      row.some((block) => block.color !== '#ffffff')
-    );
+  // setNewDimensions() {
+  //   const hasContent = this.constructorConfig.canvasArray.some((row) =>
+  //     row.some((block) => block.color !== '#ffffff')
+  //   );
 
-    if (hasContent) {
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-        data: {
-          title: 'Change Canvas Size?',
-          message:
-            'Changing the canvas size will result in losing the current design. Continue?',
-          confirmText: 'Change',
-          cancelText: 'Cancel',
-        },
-      });
+  //   if (hasContent) {
+  //     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+  //       data: {
+  //         title: 'Change Canvas Size?',
+  //         message:
+  //           'Changing the canvas size will result in losing the current design. Continue?',
+  //         confirmText: 'Change',
+  //         cancelText: 'Cancel',
+  //       },
+  //     });
 
-      dialogRef.afterClosed().subscribe((confirmed) => {
-        if (confirmed) {
-          this.performDimensionChange();
-        }
-      });
-    } else {
-      this.performDimensionChange();
-    }
-  }
+  //     dialogRef.afterClosed().subscribe((confirmed) => {
+  //       if (confirmed) {
+  //         this.performDimensionChange();
+  //       }
+  //     });
+  //   } else {
+  //     this.performDimensionChange();
+  //   }
+  // }
 
   private performDimensionChange(): void {
     this.clearAllCanvas();

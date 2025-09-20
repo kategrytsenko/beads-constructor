@@ -12,6 +12,7 @@ export interface BeadDesign {
     rows: number;
     columns: number;
   };
+  weavingPattern?: string;
   thumbnail?: string; // base64 мініатюра для превью
   isPublic?: boolean; // для майбутньої функції поділитися
 }
@@ -24,6 +25,7 @@ export interface CreateDesignRequest {
     rows: number;
     columns: number;
   };
+  weavingPattern?: string;
 }
 
 export interface UpdateDesignRequest extends Partial<CreateDesignRequest> {

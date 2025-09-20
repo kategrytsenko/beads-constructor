@@ -5,10 +5,11 @@ import { CanvasLimits, ValidationResult } from '../models/validation.model';
   providedIn: 'root',
 })
 export class CanvasLimitsService {
+  // Ліміти для різних типів користувачів
   private readonly FREE_USER_LIMITS: CanvasLimits = {
     minRows: 1,
     maxRows: 50,
-    minColumns: 1,
+    minColumns: 5,
     maxColumns: 50,
     maxTotalCells: 1500, // 30x50 max
   };
@@ -16,7 +17,7 @@ export class CanvasLimitsService {
   private readonly PREMIUM_USER_LIMITS: CanvasLimits = {
     minRows: 1,
     maxRows: 100,
-    minColumns: 1,
+    minColumns: 5,
     maxColumns: 100,
     maxTotalCells: 5000, // 50x100 max
   };
@@ -78,10 +79,12 @@ export class CanvasLimitsService {
       );
     }
 
-    // const aspectRatio = Math.max(rows, columns) / Math.min(rows, columns);
-    // if (aspectRatio > 10) {
-    //   warnings.push('Very narrow canvas proportions may be difficult to work with');
-    // }
+    const aspectRatio = Math.max(rows, columns) / Math.min(rows, columns);
+    if (aspectRatio > 10) {
+      warnings.push(
+        'Very narrow canvas proportions may be difficult to work with'
+      );
+    }
 
     return {
       isValid: errors.length === 0,
@@ -112,7 +115,6 @@ export class CanvasLimitsService {
     columns = Math.max(limits.minColumns, Math.min(limits.maxColumns, columns));
 
     const totalCells = rows * columns;
-
     if (totalCells > limits.maxTotalCells) {
       const scaleFactor = Math.sqrt(limits.maxTotalCells / totalCells);
       rows = Math.floor(rows * scaleFactor);
@@ -127,28 +129,61 @@ export class CanvasLimitsService {
     return { rows, columns, wasConstrained };
   }
 
-  getRecommendedSizes(
+  getRecommendedSizesForJewelry(
     isPremiumUser: boolean = false
-  ): Array<{ rows: number; columns: number; label: string }> {
-    const limits = isPremiumUser
-      ? this.PREMIUM_USER_LIMITS
-      : this.FREE_USER_LIMITS;
-
+  ): Array<{ rows: number; columns: number; label: string; product: string }> {
     return [
-      { rows: 10, columns: 15, label: 'Small (150 beads)' },
-      { rows: 20, columns: 25, label: 'Medium (500 beads)' },
-      { rows: 30, columns: 35, label: 'Large (1,050 beads)' },
+      // Кільця
+      { rows: 5, columns: 15, label: 'Ring - Narrow', product: 'ring' },
+      { rows: 7, columns: 18, label: 'Ring - Wide', product: 'ring' },
+
+      // Браслети
+      { rows: 7, columns: 60, label: 'Bracelet - Thin', product: 'bracelet' },
+      { rows: 9, columns: 80, label: 'Bracelet - Medium', product: 'bracelet' },
+      { rows: 11, columns: 100, label: 'Bracelet - Wide', product: 'bracelet' },
+
+      // Чокери
+      { rows: 8, columns: 120, label: 'Choker - Simple', product: 'choker' },
+      { rows: 12, columns: 140, label: 'Choker - Wide', product: 'choker' },
+
+      // Сережки
+      { rows: 20, columns: 8, label: 'Earrings - Long', product: 'earrings' },
+      { rows: 15, columns: 12, label: 'Earrings - Drop', product: 'earrings' },
+
       ...(isPremiumUser
         ? [
-            { rows: 40, columns: 50, label: 'Extra Large (2,000 beads)' },
-            { rows: 50, columns: 70, label: 'Premium Max (3,500 beads)' },
+            // Premium розміри
+            {
+              rows: 15,
+              columns: 150,
+              label: 'Bracelet - Extra Wide (Premium)',
+              product: 'bracelet',
+            },
+            {
+              rows: 18,
+              columns: 200,
+              label: 'Choker - Statement (Premium)',
+              product: 'choker',
+            },
+            {
+              rows: 30,
+              columns: 15,
+              label: 'Earrings - Chandelier (Premium)',
+              product: 'earrings',
+            },
           ]
         : []),
     ].filter(
       (size) =>
-        size.rows <= limits.maxRows &&
-        size.columns <= limits.maxColumns &&
-        size.rows * size.columns <= limits.maxTotalCells
+        size.rows <=
+          (isPremiumUser ? this.PREMIUM_USER_LIMITS : this.FREE_USER_LIMITS)
+            .maxRows &&
+        size.columns <=
+          (isPremiumUser ? this.PREMIUM_USER_LIMITS : this.FREE_USER_LIMITS)
+            .maxColumns &&
+        size.rows * size.columns <=
+          (isPremiumUser ? this.PREMIUM_USER_LIMITS : this.FREE_USER_LIMITS)
+            .maxTotalCells
     );
   }
 

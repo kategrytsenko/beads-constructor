@@ -321,3 +321,246 @@
     }
   }
 }
+
+.section-title {
+  .info-btn {
+    width: 24px;
+    height: 24px;
+    margin-left: auto;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.limits-info {
+  margin-bottom: 16px;
+  
+  .limits-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 4px solid #2196f3;
+    
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .limits-list {
+      margin: 0 0 8px 0;
+      padding-left: 16px;
+      font-size: 12px;
+      color: #666;
+      
+      li {
+        margin-bottom: 4px;
+      }
+    }
+    
+    .upgrade-hint {
+      margin: 0;
+      font-size: 11px;
+      color: #2196f3;
+      font-style: italic;
+    }
+  }
+}
+
+.size-presets {
+  margin-bottom: 20px;
+  
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .preset-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    
+    .preset-btn {
+      font-size: 12px;
+      padding: 6px 12px;
+      text-align: left;
+      
+      &:hover {
+        background-color: #e3f2fd;
+      }
+    }
+  }
+}
+
+.size-controls {
+  h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .size-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    
+    .size-field {
+      flex: 1;
+    }
+    
+    .size-separator {
+      font-size: 18px;
+      font-weight: bold;
+      color: #666;
+      margin-top: -8px; // Компенсація за mat-hint
+    }
+    
+    .size-input {
+      text-align: center;
+    }
+  }
+  
+  .canvas-info {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 4px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .info-label {
+        color: #666;
+      }
+      
+      .info-value {
+        font-weight: 500;
+        color: #333;
+      }
+    }
+  }
+  
+  .apply-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
+    .apply-size-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    
+    .auto-fix-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      color: #ff9800;
+      border-color: #ff9800;
+      
+      &:hover {
+        background-color: #fff3e0;
+      }
+    }
+  }
+}
+
+// Validation messages
+.validation-errors {
+  margin-bottom: 12px;
+  
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #ffebee;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #d32f2f;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.validation-warnings {
+  margin-bottom: 12px;
+  
+  .warning-message {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #fff3e0;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #f57c00;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.performance-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background: #e8f5e8;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #2e7d32;
+  
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .size-input-row {
+    flex-direction: column;
+    gap: 12px;
+    
+    .size-separator {
+      display: none;
+    }
+  }
+  
+  .preset-buttons {
+    .preset-btn {
+      text-align: center;
+    }
+  }
+}
