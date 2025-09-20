@@ -7,18 +7,15 @@ import { PaintBlockModel } from '../../../models/constructor.model';
   styleUrls: ['./beads-constructor.component.scss'],
 })
 export class BeadsConstructorComponent {
-@Output() colorChanged = new EventEmitter<PaintBlockModel>();
+  @Output() colorChanged = new EventEmitter<PaintBlockModel>();
 
   @Input() selectedColor!: string;
   @Input() beadsColumnArray!: number[];
   @Input() beadsRawArray!: number[];
   @Input() canvasArray!: PaintBlockModel[][];
-  
-
 
   @Input() paintBlockData!: PaintBlockModel;
 
-  
   // Нові входи для кастомних стилів
   @Input() cellStyles?: (row: number, col: number) => any;
   @Input() rowStyles?: (row: number) => any;
@@ -38,7 +35,7 @@ export class BeadsConstructorComponent {
     if (this.cellStyles) {
       return this.cellStyles(rowIndex, colIndex);
     }
-    
+
     // Дефолтні стилі
     return this.getDefaultCellStyles();
   }
@@ -48,11 +45,11 @@ export class BeadsConstructorComponent {
     if (this.rowStyles) {
       return this.rowStyles(rowIndex);
     }
-    
+
     // Дефолтні стилі
     return {
       display: 'flex',
-      'align-items': 'center'
+      'align-items': 'center',
     };
   }
 
@@ -65,7 +62,7 @@ export class BeadsConstructorComponent {
       margin: '1px',
       border: this.showGrid ? '1px solid #ddd' : '1px solid transparent',
       'border-radius': '2px',
-      cursor: 'pointer'
+      cursor: 'pointer',
     };
   }
 }

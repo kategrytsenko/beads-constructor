@@ -1,29 +1,18 @@
-<!-- <div class="beads-raw" *ngFor="let i of beadsColumnArray">
+<div
+  *ngFor="let row of canvasArray; let rowIndex = index"
+  class="beads-row"
+  [ngStyle]="getRowStyles(rowIndex)"
+  [class.brick-pattern]="isBrickPattern"
+>
   <canvas
-    *ngFor="let j of beadsRawArray"
+    *ngFor="let block of row; let colIndex = index"
     class="beads-item"
+    [ngStyle]="getCellStyles(rowIndex, colIndex)"
+    [class.show-grid]="showGrid"
+    [class.hide-grid]="!showGrid"
     width="200"
     height="200"
-    (click)="changeCanvasColor(canvasArray[j][i])"
-    [style.background-color]="canvasArray[j][i].color"
+    (click)="changeCanvasColor(block)"
+    [style.background-color]="block.color"
   ></canvas>
-</div> -->
-
-<div 
-      *ngFor="let row of canvasArray; let rowIndex = index" 
-      class="beads-row"
-      [ngStyle]="getRowStyles(rowIndex)"
-      [class.brick-pattern]="isBrickPattern"
-    >
-      <canvas
-        *ngFor="let block of row; let colIndex = index"
-        class="beads-item"
-        [ngStyle]="getCellStyles(rowIndex, colIndex)"
-        [class.show-grid]="showGrid"
-        [class.hide-grid]="!showGrid"
-        width="200"
-        height="200"
-        (click)="changeCanvasColor(block)"
-        [style.background-color]="block.color"
-      ></canvas>
-    </div>
+</div>

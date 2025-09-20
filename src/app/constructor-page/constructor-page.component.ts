@@ -22,7 +22,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
 import { CanvasLimitsService } from '../services/canvas-limits.service';
 import { CanvasViewportService } from '../services/canvas-viewport.service';
-import { WeavingPatternService, WeavingPatternType } from '../services/weaving-pattern.service';
+import {
+  WeavingPatternService,
+  WeavingPatternType,
+} from '../services/weaving-pattern.service';
 
 @Component({
   selector: 'app-constructor-page',
@@ -69,7 +72,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private canvasLimitsService: CanvasLimitsService,
     private canvasViewportService: CanvasViewportService,
-    public weavingPatternService: WeavingPatternService
+    public weavingPatternService: WeavingPatternService // Зробили публічним
   ) {}
 
   ngOnInit() {
@@ -91,7 +94,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   // ===== VIEWPORT METHODS (using your service) =====
-  
+
   private initializeViewport(): void {
     // Auto-adjust cell size based on canvas dimensions
     this.canvasViewportService.setAutoSize(
@@ -112,7 +115,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     // Потребує розміри контейнера - можна передати через ViewChild або фіксовані значення
     const containerWidth = 800; // TODO: отримувати з ViewChild
     const containerHeight = 600;
-    
+
     this.canvasViewportService.fitToContainer(
       containerWidth,
       containerHeight,
@@ -132,40 +135,45 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     this.hasUnsavedChanges = true;
   }
 
-  // ===== PRODUCT CATEGORIES =====
+  // ===== PRODUCT SIZE PRESETS =====
 
   getRecommendedProductSizes() {
     return this.weavingPatternService.getRecommendedSizesForProducts();
   }
 
-  setProductSize(productType: string, preset: { rows: number; cols: number; pattern: any }): void {
+  setProductSize(
+    productType: string,
+    preset: { rows: number; cols: number; pattern: any }
+  ): void {
     this.columnBeadsAmount = preset.rows;
     this.rawBeadsAmount = preset.cols;
     this.weavingPatternService.setPattern(preset.pattern);
     this.validateCanvasSize();
-    this.showSuccess(`Set ${productType} size: ${preset.rows}×${preset.cols} (${preset.pattern})`);
+    this.showSuccess(
+      `Set ${productType} size: ${preset.rows}×${preset.cols} (${preset.pattern})`
+    );
   }
 
   // ===== CANVAS STYLING (using your services) =====
 
-  getCellStyles(rowIndex: number, colIndex: number): any {
+  getCellStyles = (rowIndex: number, colIndex: number): any => {
     const viewportStyles = this.canvasViewportService.getCellStyles();
     const patternStyles = this.weavingPatternService.getCellStyles(
       rowIndex,
       colIndex,
       this.viewportSettings().cellSize
     );
-    
-    const gridStyles = this.showGrid 
-      ? { border: '1px solid #ddd' } 
+
+    const gridStyles = this.showGrid
+      ? { border: '1px solid #ddd' }
       : { border: 'none' };
 
     return { ...viewportStyles, ...patternStyles, ...gridStyles };
-  }
+  };
 
-  getRowStyles(rowIndex: number): any {
+  getRowStyles = (rowIndex: number): any => {
     return this.weavingPatternService.getRowStyles(rowIndex);
-  }
+  };
 
   getCanvasStyles(): any {
     return this.canvasViewportService.getCanvasStyles(
@@ -456,7 +464,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     );
     this.currentDesignId = null;
     this.hasUnsavedChanges = false;
-    
+
     // Update viewport after dimension change
     this.onCanvasSizeChange();
   }

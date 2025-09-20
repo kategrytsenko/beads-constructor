@@ -162,8 +162,14 @@
             </div>
           </div>
 
-          <div *ngIf="validationWarnings.length > 0" class="validation-warnings">
-            <div *ngFor="let warning of validationWarnings" class="warning-message">
+          <div
+            *ngIf="validationWarnings.length > 0"
+            class="validation-warnings"
+          >
+            <div
+              *ngFor="let warning of validationWarnings"
+              class="warning-message"
+            >
               <mat-icon>warning</mat-icon>
               {{ warning }}
             </div>
@@ -203,12 +209,20 @@
         <div class="product-presets">
           <h4>Product Presets</h4>
           <div class="preset-categories">
-            <div class="preset-category" *ngFor="let category of ['bracelet', 'choker', 'ring', 'earrings']">
+            <div
+              class="preset-category"
+              *ngFor="
+                let category of ['bracelet', 'choker', 'ring', 'earrings']
+              "
+            >
               <h5>{{ category | titlecase }}</h5>
               <div class="preset-buttons">
                 <button
                   mat-stroked-button
-                  *ngFor="let preset of getRecommendedProductSizes()[category] | slice:0:3"
+                  *ngFor="
+                    let preset of getRecommendedProductSizes()[category]
+                      | slice : 0 : 3
+                  "
                   (click)="setProductSize(category, preset)"
                   class="preset-btn"
                 >
@@ -244,7 +258,9 @@
                 <div class="pattern-name">{{ pattern.name }}</div>
                 <div class="pattern-description">{{ pattern.description }}</div>
                 <div class="pattern-used-for">
-                  <small>Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}</small>
+                  <small>
+                    Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}
+                  </small>
                 </div>
               </div>
             </mat-button-toggle>
@@ -254,12 +270,18 @@
         <div class="current-pattern-details">
           <h4>Current Pattern:</h4>
           <div class="pattern-card">
-            <p><strong>{{ currentWeavingPattern().name }}</strong></p>
-            <p class="pattern-desc">{{ currentWeavingPattern().description }}</p>
+            <p>
+              <strong>{{ currentWeavingPattern().name }}</strong>
+            </p>
+            <p class="pattern-desc">
+              {{ currentWeavingPattern().description }}
+            </p>
             <div class="pattern-characteristics">
               <p><strong>Best for:</strong></p>
               <ul>
-                <li *ngFor="let use of currentWeavingPattern().usedFor">{{ use }}</li>
+                <li *ngFor="let use of currentWeavingPattern().usedFor">
+                  {{ use }}
+                </li>
               </ul>
             </div>
           </div>
@@ -273,8 +295,9 @@
       <div class="canvas-toolbar">
         <div class="toolbar-left">
           <span class="canvas-info">
-            {{ columnBeadsAmount }} × {{ rawBeadsAmount }} beads
-            ({{ currentWeavingPattern().name }})
+            {{ columnBeadsAmount }} × {{ rawBeadsAmount }} beads ({{
+              currentWeavingPattern().name
+            }})
           </span>
           <span class="zoom-info">
             Zoom: {{ (viewportSettings().zoom * 100).toFixed(0) }}%
