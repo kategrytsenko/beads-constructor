@@ -32,16 +32,17 @@ export class WeavingPatternService {
       aspectRatio: 1,
       usedFor: ['Simple bracelets', 'Bookmarks', 'Belts', 'Basic patterns'],
     },
-    {
-      type: WeavingPatternType.BRICK,
-      name: 'Brick/Mosaic Weaving',
-      description:
-        'Offset pattern where beads in alternating rows are shifted for a brick-like appearance',
-      offsetEvenRows: true,
-      offsetAmount: 0.5,
-      aspectRatio: 0.866,
-      usedFor: ['Chokers', 'Wide bracelets', 'Earrings', 'Decorative panels'],
-    },
+    // TODO:
+    // {
+    //   type: WeavingPatternType.BRICK,
+    //   name: 'Brick/Mosaic Weaving',
+    //   description:
+    //     'Offset pattern where beads in alternating rows are shifted for a brick-like appearance',
+    //   offsetEvenRows: true,
+    //   offsetAmount: 0.5,
+    //   aspectRatio: 0.866,
+    //   usedFor: ['Chokers', 'Wide bracelets', 'Earrings', 'Decorative panels'],
+    // },
   ];
 
   private currentPattern = signal<WeavingPattern>(this.AVAILABLE_PATTERNS[0]);
