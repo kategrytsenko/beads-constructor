@@ -36,7 +36,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   authSubscription!: Subscription;
   isAuth = false;
   constructorConfig!: ConstructorConfig;
-  rawBeadsAmount: number = this.constructorService.rawBeadsAmount;
+  rowBeadsAmount: number = this.constructorService.rowBeadsAmount;
   columnBeadsAmount: number = this.constructorService.columnBeadsAmount;
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
@@ -99,7 +99,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     // Auto-adjust cell size based on canvas dimensions
     this.canvasViewportService.setAutoSize(
       this.columnBeadsAmount,
-      this.rawBeadsAmount
+      this.rowBeadsAmount
     );
   }
 
@@ -120,14 +120,10 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       containerWidth,
       containerHeight,
       this.columnBeadsAmount,
-      this.rawBeadsAmount
+      this.rowBeadsAmount
     );
   }
-
-  onToggleGrid(): void {
-    this.showGrid = !this.showGrid;
-  }
-
+  
   // ===== WEAVING PATTERN METHODS (using your service) =====
 
   onWeavingPatternChange(patternType: WeavingPatternType): void {
@@ -146,7 +142,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     preset: { rows: number; cols: number; pattern: any }
   ): void {
     this.columnBeadsAmount = preset.rows;
-    this.rawBeadsAmount = preset.cols;
+    this.rowBeadsAmount = preset.cols;
     this.weavingPatternService.setPattern(preset.pattern);
     this.validateCanvasSize();
     this.showSuccess(
@@ -178,7 +174,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   getCanvasStyles(): any {
     return this.canvasViewportService.getCanvasStyles(
       this.columnBeadsAmount,
-      this.rawBeadsAmount
+      this.rowBeadsAmount
     );
   }
 
@@ -186,8 +182,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
   validateCanvasSize(): void {
     const validation = this.canvasLimitsService.validateCanvasSize(
+      this.rowBeadsAmount,
       this.columnBeadsAmount,
-      this.rawBeadsAmount,
       false
     );
 
@@ -200,20 +196,20 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     // Update viewport when canvas size changes
     this.canvasViewportService.setAutoSize(
       this.columnBeadsAmount,
-      this.rawBeadsAmount
+      this.rowBeadsAmount
     );
   }
 
   constrainCanvasSize(): void {
     const constrained = this.canvasLimitsService.constrainToLimits(
+      this.rowBeadsAmount,
       this.columnBeadsAmount,
-      this.rawBeadsAmount,
       false
     );
 
     if (constrained.wasConstrained) {
-      this.columnBeadsAmount = constrained.rows;
-      this.rawBeadsAmount = constrained.columns;
+      this.columnBeadsAmount = constrained.columns;
+      this.rowBeadsAmount = constrained.rows;
       this.validateCanvasSize();
       this.showSuccess(
         `Canvas size adjusted to fit limits: ${constrained.rows}×${constrained.columns}`
@@ -223,8 +219,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
   setNewDimensions() {
     const validation = this.canvasLimitsService.validateCanvasSize(
+      this.rowBeadsAmount,
       this.columnBeadsAmount,
-      this.rawBeadsAmount,
       false
     );
 
@@ -299,8 +295,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   setRecommendedSize(rows: number, columns: number): void {
-    this.columnBeadsAmount = rows;
-    this.rawBeadsAmount = columns;
+    this.columnBeadsAmount = columns;
+    this.rowBeadsAmount = rows;
     this.validateCanvasSize();
   }
 
@@ -310,8 +306,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
   get canApplyDimensions(): boolean {
     const validation = this.canvasLimitsService.validateCanvasSize(
+      this.rowBeadsAmount,
       this.columnBeadsAmount,
-      this.rawBeadsAmount,
       false
     );
     return validation.isValid;
@@ -319,8 +315,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
   get performanceWarning(): string | null {
     return this.canvasLimitsService.getPerformanceWarning(
-      this.columnBeadsAmount,
-      this.rawBeadsAmount
+      this.rowBeadsAmount,
+      this.columnBeadsAmount
     );
   }
 
@@ -340,7 +336,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       next: (design: BeadDesign | null) => {
         if (design) {
           this.currentDesignId = design.id!;
-          this.rawBeadsAmount = design.dimensions.rows;
+          this.rowBeadsAmount = design.dimensions.rows;
           this.columnBeadsAmount = design.dimensions.columns;
 
           // Load weaving pattern if saved
@@ -351,7 +347,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
           this.constructorConfig =
             this.constructorService.resetConstructorConfig(
-              this.rawBeadsAmount,
+              this.rowBeadsAmount,
               this.columnBeadsAmount
             );
 
@@ -459,7 +455,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   private performDimensionChange(): void {
     this.clearAllCanvas();
     this.constructorConfig = this.constructorService.resetConstructorConfig(
-      this.rawBeadsAmount,
+      this.rowBeadsAmount,
       this.columnBeadsAmount
     );
     this.currentDesignId = null;
@@ -538,7 +534,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           JSON.stringify(this.constructorConfig.canvasArray)
         ),
         dimensions: {
-          rows: this.rawBeadsAmount,
+          rows: this.rowBeadsAmount,
           columns: this.columnBeadsAmount,
         },
         weavingPattern: this.weavingPatternService.serializePattern(), // Save current pattern
@@ -592,7 +588,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
     this.currentDesignId = null;
     this.constructorConfig.canvasArray =
-      this.constructorService.clearAllCanvas();
+    this.constructorService.clearAllCanvas();
     this.hasUnsavedChanges = false;
 
     // Reset to default weaving pattern

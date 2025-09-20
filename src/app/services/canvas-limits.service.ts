@@ -10,21 +10,21 @@ export class CanvasLimitsService {
     minRows: 1,
     maxRows: 50,
     minColumns: 5,
-    maxColumns: 50,
-    maxTotalCells: 1500, // 30x50 max
+    maxColumns: 200,
+    maxTotalCells: 5000, 
   };
 
   private readonly PREMIUM_USER_LIMITS: CanvasLimits = {
     minRows: 1,
     maxRows: 100,
     minColumns: 5,
-    maxColumns: 100,
-    maxTotalCells: 5000, // 50x100 max
+    maxColumns: 300,
+    maxTotalCells: 10000, 
   };
 
   private readonly PERFORMANCE_LIMITS = {
-    warningThreshold: 1000,
-    dangerThreshold: 2500,
+    warningThreshold: 4500,
+    dangerThreshold: 9000,
   };
 
   validateCanvasSize(
@@ -134,43 +134,25 @@ export class CanvasLimitsService {
   ): Array<{ rows: number; columns: number; label: string; product: string }> {
     return [
       // Кільця
-      { rows: 5, columns: 15, label: 'Ring - Narrow', product: 'ring' },
-      { rows: 7, columns: 18, label: 'Ring - Wide', product: 'ring' },
+      { rows: 5, columns: 50, label: 'Ring - Narrow', product: 'ring' },
+      { rows: 7, columns: 50, label: 'Ring - Wide', product: 'ring' },
 
       // Браслети
-      { rows: 7, columns: 60, label: 'Bracelet - Thin', product: 'bracelet' },
-      { rows: 9, columns: 80, label: 'Bracelet - Medium', product: 'bracelet' },
+      { rows: 7, columns: 100, label: 'Bracelet - Thin', product: 'bracelet' },
+      { rows: 9, columns: 100, label: 'Bracelet - Medium', product: 'bracelet' },
       { rows: 11, columns: 100, label: 'Bracelet - Wide', product: 'bracelet' },
 
       // Чокери
-      { rows: 8, columns: 120, label: 'Choker - Simple', product: 'choker' },
-      { rows: 12, columns: 140, label: 'Choker - Wide', product: 'choker' },
+      { rows: 8, columns: 200, label: 'Choker - Simple', product: 'choker' },
+      { rows: 12, columns: 200, label: 'Choker - Wide', product: 'choker' },
 
-      // Сережки
-      { rows: 20, columns: 8, label: 'Earrings - Long', product: 'earrings' },
-      { rows: 15, columns: 12, label: 'Earrings - Drop', product: 'earrings' },
+      // // Сережки
+      // { rows: 20, columns: 8, label: 'Earrings - Long', product: 'earrings' },
+      // { rows: 15, columns: 12, label: 'Earrings - Drop', product: 'earrings' },
 
       ...(isPremiumUser
         ? [
-            // Premium розміри
-            {
-              rows: 15,
-              columns: 150,
-              label: 'Bracelet - Extra Wide (Premium)',
-              product: 'bracelet',
-            },
-            {
-              rows: 18,
-              columns: 200,
-              label: 'Choker - Statement (Premium)',
-              product: 'choker',
-            },
-            {
-              rows: 30,
-              columns: 15,
-              label: 'Earrings - Chandelier (Premium)',
-              product: 'earrings',
-            },
+            // TODO: custom saved sizes
           ]
         : []),
     ].filter(

@@ -85,7 +85,7 @@
         </div>
 
         <!-- Quick size presets -->
-        <div class="size-presets">
+        <!-- <div class="size-presets">
           <h4>Quick Sizes</h4>
           <div class="preset-buttons">
             <button
@@ -97,7 +97,7 @@
               {{ size.label }}
             </button>
           </div>
-        </div>
+        </div> -->
 
         <!-- Custom size controls -->
         <div class="size-controls">
@@ -109,7 +109,7 @@
               <input
                 matInput
                 type="number"
-                [(ngModel)]="columnBeadsAmount"
+                [(ngModel)]="rowBeadsAmount"
                 (ngModelChange)="onCanvasSizeChange()"
                 [min]="canvasLimits.minRows"
                 [max]="canvasLimits.maxRows"
@@ -127,7 +127,7 @@
               <input
                 matInput
                 type="number"
-                [(ngModel)]="rawBeadsAmount"
+                [(ngModel)]="columnBeadsAmount"
                 (ngModelChange)="onCanvasSizeChange()"
                 [min]="canvasLimits.minColumns"
                 [max]="canvasLimits.maxColumns"
@@ -137,19 +137,20 @@
                 {{ canvasLimits.minColumns }}-{{ canvasLimits.maxColumns }}
               </mat-hint>
             </mat-form-field>
+
           </div>
 
           <div class="canvas-info">
             <div class="info-item">
               <span class="info-label">Total beads:</span>
               <span class="info-value">
-                {{ columnBeadsAmount * rawBeadsAmount }}
+                {{ columnBeadsAmount * rowBeadsAmount }}
               </span>
             </div>
             <div class="info-item">
               <span class="info-label">Aspect ratio:</span>
               <span class="info-value">
-                {{ (rawBeadsAmount / columnBeadsAmount).toFixed(2) }}:1
+                {{ (rowBeadsAmount / columnBeadsAmount).toFixed(2) }}:1
               </span>
             </div>
           </div>
@@ -206,9 +207,10 @@
         </div>
 
         <!-- Product Size Presets -->
-        <div class="product-presets">
+        <!-- <div class="product-presets">
           <h4>Product Presets</h4>
           <div class="preset-categories">
+            
             <div
               class="preset-category"
               *ngFor="
@@ -232,7 +234,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Weaving Pattern Selection -->
@@ -254,7 +256,8 @@
               [value]="pattern.type"
               class="pattern-toggle"
             >
-              <div class="pattern-info">
+                <span class="pattern-name">{{ pattern.name }}</span>
+              <!-- <div class="pattern-info">
                 <div class="pattern-name">{{ pattern.name }}</div>
                 <div class="pattern-description">{{ pattern.description }}</div>
                 <div class="pattern-used-for">
@@ -262,12 +265,12 @@
                     Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}
                   </small>
                 </div>
-              </div>
+              </div> -->
             </mat-button-toggle>
           </mat-button-toggle-group>
         </div>
 
-        <div class="current-pattern-details">
+        <!-- <div class="current-pattern-details">
           <h4>Current Pattern:</h4>
           <div class="pattern-card">
             <p>
@@ -285,7 +288,7 @@
               </ul>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -295,26 +298,13 @@
       <div class="canvas-toolbar">
         <div class="toolbar-left">
           <span class="canvas-info">
-            {{ columnBeadsAmount }} × {{ rawBeadsAmount }} beads ({{
+            {{ rowBeadsAmount }} × {{ columnBeadsAmount }} beads ({{
               currentWeavingPattern().name
             }})
           </span>
           <span class="zoom-info">
             Zoom: {{ (viewportSettings().zoom * 100).toFixed(0) }}%
           </span>
-        </div>
-
-        <div class="toolbar-center">
-          <!-- Grid Toggle -->
-          <button
-            mat-icon-button
-            (click)="onToggleGrid()"
-            [class.active]="showGrid"
-            matTooltip="Toggle Grid"
-            class="grid-btn"
-          >
-            <mat-icon>grid_{{ showGrid ? 'on' : 'off' }}</mat-icon>
-          </button>
         </div>
 
         <div class="toolbar-right">
