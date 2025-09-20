@@ -21,6 +21,8 @@ import { CreateDesignRequest, BeadDesign } from '../models/design.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../shared/components/confirm-dialog/confirm-dialog.component';
 import { CanvasLimitsService } from '../services/canvas-limits.service';
+import { CanvasViewportService } from '../services/canvas-viewport.service';
+import { WeavingPatternService, WeavingPatternType } from '../services/weaving-pattern.service';
 
 @Component({
   selector: 'app-constructor-page',
@@ -36,10 +38,19 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   selectedColor = '#ffffff';
   savedColors: string[] = this.colorsService.getColors();
 
-  canvasLimits = this.canvasLimitsService.getLimitsForUser(false); // TODO: передавати isPremium з профілю
+  // Canvas limits and validation
+  canvasLimits = this.canvasLimitsService.getLimitsForUser(false);
   validationErrors: string[] = [];
   validationWarnings: string[] = [];
   showLimitsInfo = false;
+
+  // Viewport settings (використовуємо signals з сервісу)
+  viewportSettings = this.canvasViewportService.settings;
+  showGrid = true;
+
+  // Weaving patterns (використовуємо signals з сервісу)
+  currentWeavingPattern = this.weavingPatternService.current;
+  availablePatterns = this.weavingPatternService.patterns;
 
   // State for saving functionality
   currentDesignId: string | null = null;
@@ -56,7 +67,9 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     private constructorService: ConstructorService,
     private colorsService: ColorsService,
     private snackBar: MatSnackBar,
-    private canvasLimitsService: CanvasLimitsService
+    private canvasLimitsService: CanvasLimitsService,
+    private canvasViewportService: CanvasViewportService,
+    public weavingPatternService: WeavingPatternService
   ) {}
 
   ngOnInit() {
@@ -68,34 +81,126 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
     this.constructorConfig = this.constructorService.getConstructorConfig();
 
+    // Initialize viewport with current canvas size
+    this.initializeViewport();
+
     // Check if we need to load an existing design
     this.checkForDesignId();
 
     this.validateCanvasSize();
   }
 
-  // Валідація розмірів canvas
+  // ===== VIEWPORT METHODS (using your service) =====
+  
+  private initializeViewport(): void {
+    // Auto-adjust cell size based on canvas dimensions
+    this.canvasViewportService.setAutoSize(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount
+    );
+  }
+
+  onZoomIn(): void {
+    this.canvasViewportService.zoomIn();
+  }
+
+  onZoomOut(): void {
+    this.canvasViewportService.zoomOut();
+  }
+
+  onFitToScreen(): void {
+    // Потребує розміри контейнера - можна передати через ViewChild або фіксовані значення
+    const containerWidth = 800; // TODO: отримувати з ViewChild
+    const containerHeight = 600;
+    
+    this.canvasViewportService.fitToContainer(
+      containerWidth,
+      containerHeight,
+      this.columnBeadsAmount,
+      this.rawBeadsAmount
+    );
+  }
+
+  onToggleGrid(): void {
+    this.showGrid = !this.showGrid;
+  }
+
+  // ===== WEAVING PATTERN METHODS (using your service) =====
+
+  onWeavingPatternChange(patternType: WeavingPatternType): void {
+    this.weavingPatternService.setPattern(patternType);
+    this.hasUnsavedChanges = true;
+  }
+
+  // ===== PRODUCT CATEGORIES =====
+
+  getRecommendedProductSizes() {
+    return this.weavingPatternService.getRecommendedSizesForProducts();
+  }
+
+  setProductSize(productType: string, preset: { rows: number; cols: number; pattern: any }): void {
+    this.columnBeadsAmount = preset.rows;
+    this.rawBeadsAmount = preset.cols;
+    this.weavingPatternService.setPattern(preset.pattern);
+    this.validateCanvasSize();
+    this.showSuccess(`Set ${productType} size: ${preset.rows}×${preset.cols} (${preset.pattern})`);
+  }
+
+  // ===== CANVAS STYLING (using your services) =====
+
+  getCellStyles(rowIndex: number, colIndex: number): any {
+    const viewportStyles = this.canvasViewportService.getCellStyles();
+    const patternStyles = this.weavingPatternService.getCellStyles(
+      rowIndex,
+      colIndex,
+      this.viewportSettings().cellSize
+    );
+    
+    const gridStyles = this.showGrid 
+      ? { border: '1px solid #ddd' } 
+      : { border: 'none' };
+
+    return { ...viewportStyles, ...patternStyles, ...gridStyles };
+  }
+
+  getRowStyles(rowIndex: number): any {
+    return this.weavingPatternService.getRowStyles(rowIndex);
+  }
+
+  getCanvasStyles(): any {
+    return this.canvasViewportService.getCanvasStyles(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount
+    );
+  }
+
+  // ===== CANVAS VALIDATION (existing) =====
+
   validateCanvasSize(): void {
     const validation = this.canvasLimitsService.validateCanvasSize(
       this.columnBeadsAmount,
       this.rawBeadsAmount,
-      false // TODO: отримувати з профілю користувача
+      false
     );
 
     this.validationErrors = validation.errors;
     this.validationWarnings = validation.warnings;
   }
 
-  // Викликається при зміні розмірів
   onCanvasSizeChange(): void {
     this.validateCanvasSize();
+    // Update viewport when canvas size changes
+    this.canvasViewportService.setAutoSize(
+      this.columnBeadsAmount,
+      this.rawBeadsAmount
+    );
   }
 
   constrainCanvasSize(): void {
     const constrained = this.canvasLimitsService.constrainToLimits(
       this.columnBeadsAmount,
       this.rawBeadsAmount,
-      false // TODO: isPremium
+      false
     );
 
     if (constrained.wasConstrained) {
@@ -108,7 +213,6 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Оновлений метод зміни розмірів
   setNewDimensions() {
     const validation = this.canvasLimitsService.validateCanvasSize(
       this.columnBeadsAmount,
@@ -117,7 +221,6 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     );
 
     if (!validation.isValid) {
-      // Показуємо діалог з помилками
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
           title: 'Invalid Canvas Size',
@@ -138,7 +241,6 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Показуємо попередження, якщо є
     if (validation.warnings.length > 0) {
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
@@ -159,7 +261,6 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Стандартна перевірка контенту
     const hasContent = this.constructorConfig.canvasArray.some((row) =>
       row.some((block) => block.color !== '#ffffff')
     );
@@ -185,24 +286,20 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Показати інформацію про ліміти
   toggleLimitsInfo(): void {
     this.showLimitsInfo = !this.showLimitsInfo;
   }
 
-  // Встановити рекомендований розмір
   setRecommendedSize(rows: number, columns: number): void {
     this.columnBeadsAmount = rows;
     this.rawBeadsAmount = columns;
     this.validateCanvasSize();
   }
 
-  // Отримати рекомендовані розміри
   get recommendedSizes() {
-    return this.canvasLimitsService.getRecommendedSizes(false); // TODO: isPremium
+    return this.canvasLimitsService.getRecommendedSizesForJewelry(false);
   }
 
-  // Перевірка, чи розміри валідні для кнопки Apply
   get canApplyDimensions(): boolean {
     const validation = this.canvasLimitsService.validateCanvasSize(
       this.columnBeadsAmount,
@@ -212,13 +309,14 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     return validation.isValid;
   }
 
-  // Отримати попередження про продуктивність
   get performanceWarning(): string | null {
     return this.canvasLimitsService.getPerformanceWarning(
       this.columnBeadsAmount,
       this.rawBeadsAmount
     );
   }
+
+  // ===== DESIGN LOADING/SAVING (existing methods) =====
 
   private checkForDesignId(): void {
     const designId = this.route.snapshot.queryParams['designId'];
@@ -237,16 +335,23 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           this.rawBeadsAmount = design.dimensions.rows;
           this.columnBeadsAmount = design.dimensions.columns;
 
-          // First create new canvas with correct dimensions
+          // Load weaving pattern if saved
+          if (design.weavingPattern) {
+            const patternType = design.weavingPattern as WeavingPatternType;
+            this.weavingPatternService.setPattern(patternType);
+          }
+
           this.constructorConfig =
             this.constructorService.resetConstructorConfig(
               this.rawBeadsAmount,
               this.columnBeadsAmount
             );
 
-          // Then apply saved data to each cell
           this.applyDesignDataToCanvas(design.canvasData);
           this.hasUnsavedChanges = false;
+
+          // Update viewport for loaded design
+          this.onCanvasSizeChange();
 
           this.showSuccess(`Design "${design.name}" loaded`);
         } else {
@@ -264,7 +369,6 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   }
 
   private applyDesignDataToCanvas(savedCanvasData: PaintBlockModel[][]): void {
-    // Check if saved design dimensions match current canvas
     if (!savedCanvasData || savedCanvasData.length === 0) {
       return;
     }
@@ -274,21 +378,14 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     const currentRows = this.constructorConfig.canvasArray.length;
     const currentCols = this.constructorConfig.canvasArray[0]?.length || 0;
 
-    console.log(
-      `Applying design: saved ${savedRows}x${savedCols}, current ${currentRows}x${currentCols}`
-    );
-
-    // Apply saved colors to current canvas
     for (let row = 0; row < Math.min(savedRows, currentRows); row++) {
       for (let col = 0; col < Math.min(savedCols, currentCols); col++) {
         if (savedCanvasData[row] && savedCanvasData[row][col]) {
-          // Use constructor service for proper updating
           const paintBlock: PaintBlockModel = {
             ...this.constructorConfig.canvasArray[row][col],
             color: savedCanvasData[row][col].color,
           };
 
-          // Apply change through service
           this.constructorConfig.canvasArray =
             this.constructorService.onColorChanged(
               paintBlock,
@@ -298,6 +395,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  // ===== COLOR METHODS (existing) =====
 
   setWhite() {
     this.selectedColor = '#ffffff';
@@ -314,6 +413,8 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
   selectColor(color: string) {
     this.selectedColor = color;
   }
+
+  // ===== CANVAS MANIPULATION (existing) =====
 
   clearAllCanvas() {
     const hasContent = this.constructorConfig.canvasArray.some((row) =>
@@ -347,44 +448,20 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     this.hasUnsavedChanges = true;
   }
 
-  // setNewDimensions() {
-  //   const hasContent = this.constructorConfig.canvasArray.some((row) =>
-  //     row.some((block) => block.color !== '#ffffff')
-  //   );
-
-  //   if (hasContent) {
-  //     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-  //       data: {
-  //         title: 'Change Canvas Size?',
-  //         message:
-  //           'Changing the canvas size will result in losing the current design. Continue?',
-  //         confirmText: 'Change',
-  //         cancelText: 'Cancel',
-  //       },
-  //     });
-
-  //     dialogRef.afterClosed().subscribe((confirmed) => {
-  //       if (confirmed) {
-  //         this.performDimensionChange();
-  //       }
-  //     });
-  //   } else {
-  //     this.performDimensionChange();
-  //   }
-  // }
-
   private performDimensionChange(): void {
     this.clearAllCanvas();
     this.constructorConfig = this.constructorService.resetConstructorConfig(
       this.rawBeadsAmount,
       this.columnBeadsAmount
     );
-    this.currentDesignId = null; // New canvas = new design
+    this.currentDesignId = null;
     this.hasUnsavedChanges = false;
+    
+    // Update viewport after dimension change
+    this.onCanvasSizeChange();
   }
 
   onColorChanged(paintedBlock: PaintBlockModel | any) {
-    // Type guard to ensure we have the right type
     if (
       paintedBlock &&
       typeof paintedBlock === 'object' &&
@@ -399,17 +476,17 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ===== SAVE/LOAD METHODS (updated to include weaving pattern) =====
+
   async onDesignSave() {
     if (!this.isAuth) {
       this.dialog.open(MotivateLoginPopupComponent);
       return;
     }
 
-    // If updating existing design, load current data
     let currentDesignData: BeadDesign | null = null;
     if (this.currentDesignId) {
       try {
-        // Get current design from database using firstValueFrom
         currentDesignData = await firstValueFrom(
           this.designService.getDesignById(this.currentDesignId).pipe(take(1))
         );
@@ -451,15 +528,15 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
         description: dialogResult.description,
         canvasData: JSON.parse(
           JSON.stringify(this.constructorConfig.canvasArray)
-        ), // deep copy
+        ),
         dimensions: {
           rows: this.rawBeadsAmount,
           columns: this.columnBeadsAmount,
         },
+        weavingPattern: this.weavingPatternService.serializePattern(), // Save current pattern
       };
 
       if (this.currentDesignId) {
-        // Update existing design
         const success = await this.designService.updateDesign({
           id: this.currentDesignId,
           ...designData,
@@ -469,14 +546,12 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
           this.hasUnsavedChanges = false;
         }
       } else {
-        // Create new design
         const newDesignId = await this.designService.createDesign(designData);
 
         if (newDesignId) {
           this.currentDesignId = newDesignId;
           this.hasUnsavedChanges = false;
 
-          // Update URL with new ID
           this.router.navigate([], {
             relativeTo: this.route,
             queryParams: { designId: newDesignId },
@@ -512,7 +587,9 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       this.constructorService.clearAllCanvas();
     this.hasUnsavedChanges = false;
 
-    // Clear URL parameters
+    // Reset to default weaving pattern
+    this.weavingPatternService.setPattern(WeavingPatternType.STRAIGHT);
+
     this.router.navigate(['/'], { queryParams: {} });
     this.showSuccess('Created new design');
   }

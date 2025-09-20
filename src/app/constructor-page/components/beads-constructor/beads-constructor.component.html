@@ -1,4 +1,4 @@
-<div class="beads-raw" *ngFor="let i of beadsColumnArray">
+<!-- <div class="beads-raw" *ngFor="let i of beadsColumnArray">
   <canvas
     *ngFor="let j of beadsRawArray"
     class="beads-item"
@@ -7,4 +7,23 @@
     (click)="changeCanvasColor(canvasArray[j][i])"
     [style.background-color]="canvasArray[j][i].color"
   ></canvas>
-</div>
+</div> -->
+
+<div 
+      *ngFor="let row of canvasArray; let rowIndex = index" 
+      class="beads-row"
+      [ngStyle]="getRowStyles(rowIndex)"
+      [class.brick-pattern]="isBrickPattern"
+    >
+      <canvas
+        *ngFor="let block of row; let colIndex = index"
+        class="beads-item"
+        [ngStyle]="getCellStyles(rowIndex, colIndex)"
+        [class.show-grid]="showGrid"
+        [class.hide-grid]="!showGrid"
+        width="200"
+        height="200"
+        (click)="changeCanvasColor(block)"
+        [style.background-color]="block.color"
+      ></canvas>
+    </div>

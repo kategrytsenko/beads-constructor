@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonToggleModule } from '@angular/material/button-toggle'; 
 
 // Angular Flex Layout
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -43,6 +44,7 @@ import { CanvasLimitsService } from '../services/canvas-limits.service';
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatButtonToggleModule,
 
     // Custom modules
     SharedModule,
