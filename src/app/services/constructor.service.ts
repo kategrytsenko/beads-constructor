@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import {
   ConstructorConfig,
   PaintBlockModel,
-} from '../models/constructor-models';
+} from '../models/constructor.model';
 import { generateCanvasArray, getArrayWithSettedLength } from '../utils';
 
 @Injectable()
 export class ConstructorService {
-  rawBeadsAmount: number = Number(localStorage.getItem('rawBeadsAmount')) || 11;
+  rowBeadsAmount: number = Number(localStorage.getItem('rowBeadsAmount')) || 11;
   columnBeadsAmount: number =
     Number(localStorage.getItem('columnBeadsAmount')) || 11;
 
@@ -17,18 +17,18 @@ export class ConstructorService {
     return this.canvasArray.slice();
   }
 
-  saveToStorage(rawBeadsAmount: number, columnBeadsAmount: number): void {
-    localStorage.setItem('rawBeadsAmount', rawBeadsAmount.toString());
+  saveToStorage(rowBeadsAmount: number, columnBeadsAmount: number): void {
+    localStorage.setItem('rowBeadsAmount', rowBeadsAmount.toString());
     localStorage.setItem('columnBeadsAmount', columnBeadsAmount.toString());
     localStorage.setItem('canvasArray', JSON.stringify(this.canvasArray));
   }
 
   getConfig(
-    rawBeadsAmount: number,
+    rowBeadsAmount: number,
     columnBeadsAmount: number
   ): ConstructorConfig {
     return {
-      beadsRawArray: getArrayWithSettedLength(rawBeadsAmount),
+      beadsRawArray: getArrayWithSettedLength(rowBeadsAmount),
       beadsColumnArray: getArrayWithSettedLength(columnBeadsAmount),
       canvasArray: this.getCanvasArray(),
     };
@@ -37,24 +37,24 @@ export class ConstructorService {
   getConstructorConfig(): ConstructorConfig {
     this.canvasArray =
       JSON.parse(localStorage.getItem('canvasArray') || 'null') ||
-      generateCanvasArray(this.rawBeadsAmount, this.columnBeadsAmount);
+      generateCanvasArray(this.rowBeadsAmount, this.columnBeadsAmount);
 
-    this.saveToStorage(this.rawBeadsAmount, this.columnBeadsAmount);
+    this.saveToStorage(this.rowBeadsAmount, this.columnBeadsAmount);
 
-    return this.getConfig(this.rawBeadsAmount, this.columnBeadsAmount);
+    return this.getConfig(this.rowBeadsAmount, this.columnBeadsAmount);
   }
 
   resetConstructorConfig(
-    rawBeadsAmount: number,
+    rowBeadsAmount: number,
     columnBeadsAmount: number
   ): ConstructorConfig {
-    this.rawBeadsAmount = rawBeadsAmount;
+    this.rowBeadsAmount = rowBeadsAmount;
     this.columnBeadsAmount = columnBeadsAmount;
-    this.canvasArray = generateCanvasArray(rawBeadsAmount, columnBeadsAmount);
+    this.canvasArray = generateCanvasArray(rowBeadsAmount, columnBeadsAmount);
 
-    this.saveToStorage(rawBeadsAmount, columnBeadsAmount);
+    this.saveToStorage(rowBeadsAmount, columnBeadsAmount);
 
-    return this.getConfig(rawBeadsAmount, columnBeadsAmount);
+    return this.getConfig(rowBeadsAmount, columnBeadsAmount);
   }
 
   onColorChanged(

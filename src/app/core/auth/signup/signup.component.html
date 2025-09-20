@@ -18,20 +18,18 @@
         E-mail is invalid
       </mat-error>
     </mat-form-field>
-    <mat-form-field hintLabel="Should be at least 6 characters long">
-      <input
-        type="password"
-        matInput
-        placeholder="Your password"
-        ngModel
-        name="password"
-        required
-        minlength="6"
-        #pwInput="ngModel"
-      />
-      <mat-hint align="end">/{{ pwInput.value?.length }}</mat-hint>
-      <mat-error>Has to be at least 6 characters long</mat-error>
-    </mat-form-field>
+    <app-password-input
+      label="Password"
+      placeholder="Your password"
+      hint="Should be at least 6 characters long"
+      ngModel
+      name="password"
+      [required]="true"
+      #pwInput="ngModel"
+      [showError]="!!(pwInput.touched && pwInput.invalid)"
+      errorMessage="Has to be at least 6 characters long"
+    ></app-password-input>
+
     <button
       type="submit"
       mat-raised-button

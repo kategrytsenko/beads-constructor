@@ -1,17 +1,26 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { MatFormField } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
   standalone: true,
   selector: 'app-verify-email',
   templateUrl: './verify-email.component.html',
   styleUrls: ['./verify-email.component.scss'],
-  imports: [MatFormField, CommonModule, MatButtonModule, MatInputModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    SharedModule,
+  ],
 })
 export class VerifyEmailComponent {
   email = this.route.snapshot.queryParamMap.get('email') ?? '';
@@ -25,12 +34,14 @@ export class VerifyEmailComponent {
     private router: Router
   ) {}
 
-  async resend(emailInput: HTMLInputElement, passwordInput: HTMLInputElement) {
+  async resend(form: NgForm) {
+    if (form.invalid) return;
+
     this.loading = true;
     this.error = '';
     try {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+      const email = form.value.email.trim();
+      const password = form.value.password;
       const cred = await this.afAuth.signInWithEmailAndPassword(
         email,
         password

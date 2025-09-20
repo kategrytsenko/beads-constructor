@@ -18,17 +18,16 @@
         E-mail is invalid
       </mat-error>
     </mat-form-field>
-    <mat-form-field>
-      <input
-        type="password"
-        matInput
-        placeholder="Your password"
-        ngModel
-        name="password"
-        required
-        #pwInput="ngModel"
-      />
-    </mat-form-field>
+    <app-password-input
+      label="Password"
+      placeholder="Your password"
+      ngModel
+      name="password"
+      [required]="true"
+      #pwInput="ngModel"
+      [showError]="!!(pwInput.touched && pwInput.invalid)"
+      errorMessage="Password is required"
+    ></app-password-input>
     <button
       type="submit"
       mat-raised-button

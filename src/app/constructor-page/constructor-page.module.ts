@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 // Angular Flex Layout
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -24,6 +25,7 @@ import { SharedModule } from '../shared/shared.module';
 import { SaveDesignDialogModule } from './components/save-design-dialog/save-design-dialog.module';
 import { BeadsConstructorModule } from './components/beads-constructor/beads-constructor.module';
 import { PaintingPanelModule } from './components/painting-panel/painting-panel.module';
+import { CanvasLimitsService } from '../services/canvas-limits.service';
 
 @NgModule({
   declarations: [ConstructorPageComponent],
@@ -42,6 +44,7 @@ import { PaintingPanelModule } from './components/painting-panel/painting-panel.
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    MatButtonToggleModule,
 
     // Custom modules
     SharedModule,
@@ -50,5 +53,6 @@ import { PaintingPanelModule } from './components/painting-panel/painting-panel.
     PaintingPanelModule, // ДОДАНО
   ],
   exports: [ConstructorPageComponent],
+  providers: [CanvasLimitsService],
 })
 export class ConstructorPageModule {}

@@ -32,6 +32,7 @@
   <div class="constructor-layout">
     <!-- Left Sidebar - Tools -->
     <div class="sidebar sidebar-left">
+      <!-- Colors Section -->
       <div class="sidebar-section">
         <h3 class="section-title">
           <mat-icon>palette</mat-icon>
@@ -54,43 +55,239 @@
         <h3 class="section-title">
           <mat-icon>grid_on</mat-icon>
           Canvas Size
+          <button
+            mat-icon-button
+            (click)="toggleLimitsInfo()"
+            matTooltip="Size limits info"
+            class="info-btn"
+          >
+            <mat-icon>info</mat-icon>
+          </button>
         </h3>
 
-        <div class="size-controls">
-          <mat-form-field appearance="outline" class="size-field">
-            <mat-label>Rows</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="columnBeadsAmount"
-              min="1"
-              max="100"
-              class="size-input"
-            />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="size-field">
-            <mat-label>Columns</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="rawBeadsAmount"
-              min="1"
-              max="100"
-              class="size-input"
-            />
-          </mat-form-field>
-
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="setNewDimensions()"
-            class="apply-size-btn"
-          >
-            <mat-icon>check</mat-icon>
-            Apply
-          </button>
+        <!-- Limits info panel -->
+        <div *ngIf="showLimitsInfo" class="limits-info">
+          <div class="limits-card">
+            <h4>Size Limits</h4>
+            <ul class="limits-list">
+              <li>
+                Rows: {{ canvasLimits.minRows }}-{{ canvasLimits.maxRows }}
+              </li>
+              <li>
+                Columns: {{ canvasLimits.minColumns }}-{{
+                  canvasLimits.maxColumns
+                }}
+              </li>
+              <li>Max cells: {{ canvasLimits.maxTotalCells }}</li>
+            </ul>
+            <p class="upgrade-hint">Upgrade to Premium for larger canvases!</p>
+          </div>
         </div>
+
+        <!-- Quick size presets -->
+        <!-- <div class="size-presets">
+          <h4>Quick Sizes</h4>
+          <div class="preset-buttons">
+            <button
+              *ngFor="let size of recommendedSizes"
+              mat-stroked-button
+              (click)="setRecommendedSize(size.rows, size.columns)"
+              class="preset-btn"
+            >
+              {{ size.label }}
+            </button>
+          </div>
+        </div> -->
+
+        <!-- Custom size controls -->
+        <div class="size-controls">
+          <h4>Custom Size</h4>
+
+          <div class="size-input-row">
+            <mat-form-field appearance="outline" class="size-field">
+              <mat-label>Rows</mat-label>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="rowBeadsAmount"
+                (ngModelChange)="onCanvasSizeChange()"
+                [min]="canvasLimits.minRows"
+                [max]="canvasLimits.maxRows"
+                class="size-input"
+              />
+              <mat-hint>
+                {{ canvasLimits.minRows }}-{{ canvasLimits.maxRows }}
+              </mat-hint>
+            </mat-form-field>
+
+            <span class="size-separator">×</span>
+
+            <mat-form-field appearance="outline" class="size-field">
+              <mat-label>Columns</mat-label>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="columnBeadsAmount"
+                (ngModelChange)="onCanvasSizeChange()"
+                [min]="canvasLimits.minColumns"
+                [max]="canvasLimits.maxColumns"
+                class="size-input"
+              />
+              <mat-hint>
+                {{ canvasLimits.minColumns }}-{{ canvasLimits.maxColumns }}
+              </mat-hint>
+            </mat-form-field>
+          </div>
+
+          <div class="canvas-info">
+            <div class="info-item">
+              <span class="info-label">Total beads:</span>
+              <span class="info-value">
+                {{ columnBeadsAmount * rowBeadsAmount }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Aspect ratio:</span>
+              <span class="info-value">
+                {{ (rowBeadsAmount / columnBeadsAmount).toFixed(2) }}:1
+              </span>
+            </div>
+          </div>
+
+          <!-- Validation Messages -->
+          <div *ngIf="validationErrors.length > 0" class="validation-errors">
+            <div *ngFor="let error of validationErrors" class="error-message">
+              <mat-icon>error</mat-icon>
+              {{ error }}
+            </div>
+          </div>
+
+          <div
+            *ngIf="validationWarnings.length > 0"
+            class="validation-warnings"
+          >
+            <div
+              *ngFor="let warning of validationWarnings"
+              class="warning-message"
+            >
+              <mat-icon>warning</mat-icon>
+              {{ warning }}
+            </div>
+          </div>
+
+          <!-- Performance warning -->
+          <div *ngIf="performanceWarning" class="performance-warning">
+            <mat-icon>speed</mat-icon>
+            {{ performanceWarning }}
+          </div>
+
+          <div class="apply-section">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="setNewDimensions()"
+              [disabled]="!canApplyDimensions"
+              class="apply-size-btn"
+            >
+              <mat-icon>check</mat-icon>
+              Apply Size
+            </button>
+
+            <button
+              *ngIf="!canApplyDimensions"
+              mat-stroked-button
+              (click)="constrainCanvasSize()"
+              class="auto-fix-btn"
+            >
+              <mat-icon>auto_fix_high</mat-icon>
+              Auto-fix
+            </button>
+          </div>
+        </div>
+
+        <!-- Product Size Presets -->
+        <!-- <div class="product-presets">
+          <h4>Product Presets</h4>
+          <div class="preset-categories">
+            
+            <div
+              class="preset-category"
+              *ngFor="
+                let category of ['bracelet', 'choker', 'ring', 'earrings']
+              "
+            >
+              <h5>{{ category | titlecase }}</h5>
+              <div class="preset-buttons">
+                <button
+                  mat-stroked-button
+                  *ngFor="
+                    let preset of getRecommendedProductSizes()[category]
+                      | slice : 0 : 3
+                  "
+                  (click)="setProductSize(category, preset)"
+                  class="preset-btn"
+                >
+                  {{ preset.rows }}×{{ preset.cols }}
+                  <span class="preset-pattern">({{ preset.pattern }})</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- Weaving Pattern Selection -->
+      <div class="sidebar-section">
+        <h3 class="section-title">
+          <mat-icon>texture</mat-icon>
+          Weaving Pattern
+        </h3>
+
+        <div class="pattern-selector">
+          <mat-button-toggle-group
+            [value]="currentWeavingPattern().type"
+            (change)="onWeavingPatternChange($event.value)"
+            class="pattern-toggle-group"
+            vertical
+          >
+            <mat-button-toggle
+              *ngFor="let pattern of availablePatterns"
+              [value]="pattern.type"
+              class="pattern-toggle"
+            >
+              <span class="pattern-name">{{ pattern.name }}</span>
+              <!-- <div class="pattern-info">
+                <div class="pattern-name">{{ pattern.name }}</div>
+                <div class="pattern-description">{{ pattern.description }}</div>
+                <div class="pattern-used-for">
+                  <small>
+                    Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}
+                  </small>
+                </div>
+              </div> -->
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+
+        <!-- <div class="current-pattern-details">
+          <h4>Current Pattern:</h4>
+          <div class="pattern-card">
+            <p>
+              <strong>{{ currentWeavingPattern().name }}</strong>
+            </p>
+            <p class="pattern-desc">
+              {{ currentWeavingPattern().description }}
+            </p>
+            <div class="pattern-characteristics">
+              <p><strong>Best for:</strong></p>
+              <ul>
+                <li *ngFor="let use of currentWeavingPattern().usedFor">
+                  {{ use }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div> -->
       </div>
     </div>
 
@@ -100,20 +297,42 @@
       <div class="canvas-toolbar">
         <div class="toolbar-left">
           <span class="canvas-info">
-            {{ columnBeadsAmount }} × {{ rawBeadsAmount }} beads
+            {{ rowBeadsAmount }} × {{ columnBeadsAmount }} beads ({{
+              currentWeavingPattern().name
+            }})
+          </span>
+          <span class="zoom-info">
+            Zoom: {{ (viewportSettings().zoom * 100).toFixed(0) }}%
           </span>
         </div>
 
         <div class="toolbar-right">
-          <button mat-icon-button matTooltip="Zoom In" class="zoom-btn">
-            <mat-icon>zoom_in</mat-icon>
-          </button>
-
-          <button mat-icon-button matTooltip="Zoom Out" class="zoom-btn">
+          <button
+            mat-icon-button
+            (click)="onZoomOut()"
+            matTooltip="Zoom Out"
+            class="zoom-btn"
+            [disabled]="viewportSettings().zoom <= viewportSettings().minZoom"
+          >
             <mat-icon>zoom_out</mat-icon>
           </button>
 
-          <button mat-icon-button matTooltip="Fit to Screen" class="zoom-btn">
+          <button
+            mat-icon-button
+            (click)="onZoomIn()"
+            matTooltip="Zoom In"
+            class="zoom-btn"
+            [disabled]="viewportSettings().zoom >= viewportSettings().maxZoom"
+          >
+            <mat-icon>zoom_in</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            (click)="onFitToScreen()"
+            matTooltip="Fit to Screen"
+            class="zoom-btn"
+          >
             <mat-icon>fit_screen</mat-icon>
           </button>
         </div>
@@ -122,18 +341,23 @@
       <!-- The actual canvas -->
       <div class="canvas-container">
         <div class="canvas-wrapper">
-          <app-beads-constructor
-            [selectedColor]="selectedColor"
-            [beadsColumnArray]="constructorConfig.beadsColumnArray"
-            [beadsRawArray]="constructorConfig.beadsRawArray"
-            [canvasArray]="constructorConfig.canvasArray"
-            (colorChanged)="onColorChanged($event)"
-          ></app-beads-constructor>
+          <div class="canvas-grid" [ngStyle]="getCanvasStyles()">
+            <app-beads-constructor
+              [selectedColor]="selectedColor"
+              [beadsColumnArray]="constructorConfig.beadsColumnArray"
+              [beadsRawArray]="constructorConfig.beadsRawArray"
+              [canvasArray]="constructorConfig.canvasArray"
+              [cellStyles]="getCellStyles"
+              [rowStyles]="getRowStyles"
+              [showGrid]="showGrid"
+              (colorChanged)="onColorChanged($event)"
+            ></app-beads-constructor>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Right Sidebar - Actions (mobile: bottom panel) -->
+    <!-- Right Sidebar - Actions -->
     <div class="sidebar sidebar-right">
       <!-- Quick Actions -->
       <div class="sidebar-section">
@@ -166,6 +390,18 @@
             <mat-icon *ngIf="!isSaving">save</mat-icon>
             <span>{{ currentDesignId ? 'Update' : 'Save' }}</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Performance Info -->
+      <div class="sidebar-section" *ngIf="performanceWarning">
+        <h3 class="section-title">
+          <mat-icon color="warn">warning</mat-icon>
+          Performance
+        </h3>
+        <div class="performance-warning">
+          <mat-icon color="warn">warning</mat-icon>
+          <p>{{ performanceWarning }}</p>
         </div>
       </div>
 
