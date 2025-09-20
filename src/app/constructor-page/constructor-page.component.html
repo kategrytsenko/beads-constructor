@@ -55,7 +55,7 @@
         <h3 class="section-title">
           <mat-icon>grid_on</mat-icon>
           Canvas Size
-            <button
+          <button
             mat-icon-button
             (click)="toggleLimitsInfo()"
             matTooltip="Size limits info"
@@ -65,7 +65,7 @@
           </button>
         </h3>
 
-                <!-- Limits info panel -->
+        <!-- Limits info panel -->
         <div *ngIf="showLimitsInfo" class="limits-info">
           <div class="limits-card">
             <h4>Size Limits</h4>
@@ -100,9 +100,8 @@
         </div>
 
         <!-- Custom size controls -->
-
         <div class="size-controls">
-           <h4>Custom Size</h4>
+          <h4>Custom Size</h4>
 
           <div class="size-input-row">
             <mat-form-field appearance="outline" class="size-field">
@@ -140,43 +139,6 @@
             </mat-form-field>
           </div>
 
-          <mat-form-field appearance="outline" class="size-field">
-            <mat-label>Rows</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="columnBeadsAmount"
-              (ngModelChange)="onCanvasSizeChange()"
-              min="1"
-              max="100"
-              class="size-input"
-            />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="size-field">
-            <mat-label>Columns</mat-label>
-            <input
-              matInput
-              type="number"
-              [(ngModel)]="rawBeadsAmount"
-              (ngModelChange)="onCanvasSizeChange()"
-              min="1"
-              max="100"
-              class="size-input"
-            />
-          </mat-form-field>
-
-          <!-- <button
-            mat-raised-button
-            color="primary"
-            (click)="setNewDimensions()"
-            class="apply-size-btn"
-          >
-            <mat-icon>check</mat-icon>
-            Apply
-          </button> -->
-        </div>
-
           <div class="canvas-info">
             <div class="info-item">
               <span class="info-label">Total beads:</span>
@@ -195,14 +157,14 @@
           <!-- Validation Messages -->
           <div *ngIf="validationErrors.length > 0" class="validation-errors">
             <div *ngFor="let error of validationErrors" class="error-message">
-              <mat-icon color="warn">error</mat-icon>
+              <mat-icon>error</mat-icon>
               {{ error }}
             </div>
           </div>
 
           <div *ngIf="validationWarnings.length > 0" class="validation-warnings">
             <div *ngFor="let warning of validationWarnings" class="warning-message">
-              <mat-icon color="accent">warning</mat-icon>
+              <mat-icon>warning</mat-icon>
               {{ warning }}
             </div>
           </div>
@@ -212,18 +174,32 @@
             <mat-icon>speed</mat-icon>
             {{ performanceWarning }}
           </div>
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="setNewDimensions()"
-            [disabled]="!canApplyDimensions"
-            class="apply-size-btn"
-          >
-            <mat-icon>check</mat-icon>
-            Apply
-          </button>
+
+          <div class="apply-section">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="setNewDimensions()"
+              [disabled]="!canApplyDimensions"
+              class="apply-size-btn"
+            >
+              <mat-icon>check</mat-icon>
+              Apply Size
+            </button>
+
+            <button
+              *ngIf="!canApplyDimensions"
+              mat-stroked-button
+              (click)="constrainCanvasSize()"
+              class="auto-fix-btn"
+            >
+              <mat-icon>auto_fix_high</mat-icon>
+              Auto-fix
+            </button>
+          </div>
         </div>
 
+        <!-- Product Size Presets -->
         <div class="product-presets">
           <h4>Product Presets</h4>
           <div class="preset-categories">
@@ -243,77 +219,53 @@
             </div>
           </div>
         </div>
-
-               <button
-              *ngIf="!canApplyDimensions"
-              mat-stroked-button
-              (click)="constrainCanvasSize()"
-              class="auto-fix-btn"
-            >
-              <mat-icon>auto_fix_high</mat-icon>
-              Auto-fix
-            </button>
-        <!-- Limits Info -->
-        <button
-          mat-button
-          (click)="toggleLimitsInfo()"
-          class="limits-toggle"
-        >
-          <mat-icon>info</mat-icon>
-          {{ showLimitsInfo ? 'Hide' : 'Show' }} Limits
-        </button>
-
-        <div *ngIf="showLimitsInfo" class="limits-info">
-          <p><strong>Current Limits:</strong></p>
-          <ul>
-            <li>Max rows: {{ canvasLimits.maxRows }}</li>
-            <li>Max columns: {{ canvasLimits.maxColumns }}</li>
-            <li>Max cells: {{ canvasLimits.maxTotalCells }}</li>
-          </ul>
-        </div>
       </div>
 
       <!-- Weaving Pattern Selection -->
       <div class="sidebar-section">
         <h3 class="section-title">
-          <mat-icon>pattern</mat-icon>
+          <mat-icon>texture</mat-icon>
           Weaving Pattern
         </h3>
 
-        <mat-button-toggle-group
-          [value]="currentWeavingPattern().type"
-          (change)="onWeavingPatternChange($event.value)"
-          class="pattern-toggle-group"
-          vertical
-        >
-          <mat-button-toggle
-            *ngFor="let pattern of availablePatterns"
-            [value]="pattern.type"
-            class="pattern-toggle"
+        <div class="pattern-selector">
+          <mat-button-toggle-group
+            [value]="currentWeavingPattern().type"
+            (change)="onWeavingPatternChange($event.value)"
+            class="pattern-toggle-group"
+            vertical
           >
-            <div class="pattern-info">
-              <div class="pattern-name">{{ pattern.name }}</div>
-              <div class="pattern-description">{{ pattern.description }}</div>
-              <div class="pattern-used-for">
-                <small>Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}</small>
+            <mat-button-toggle
+              *ngFor="let pattern of availablePatterns"
+              [value]="pattern.type"
+              class="pattern-toggle"
+            >
+              <div class="pattern-info">
+                <div class="pattern-name">{{ pattern.name }}</div>
+                <div class="pattern-description">{{ pattern.description }}</div>
+                <div class="pattern-used-for">
+                  <small>Good for: {{ pattern.usedFor.slice(0, 2).join(', ') }}</small>
+                </div>
               </div>
-            </div>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
 
-        <div class="current-pattern-details" *ngIf="currentWeavingPattern">
-          <h4>Current Pattern Details:</h4>
-          <p><strong>{{ currentWeavingPattern().name }}</strong></p>
-          <p>{{ currentWeavingPattern().description }}</p>
-          <div class="pattern-characteristics">
-            <p><strong>Best for:</strong></p>
-            <ul>
-              <li *ngFor="let use of currentWeavingPattern().usedFor">{{ use }}</li>
-            </ul>
+        <div class="current-pattern-details">
+          <h4>Current Pattern:</h4>
+          <div class="pattern-card">
+            <p><strong>{{ currentWeavingPattern().name }}</strong></p>
+            <p class="pattern-desc">{{ currentWeavingPattern().description }}</p>
+            <div class="pattern-characteristics">
+              <p><strong>Best for:</strong></p>
+              <ul>
+                <li *ngFor="let use of currentWeavingPattern().usedFor">{{ use }}</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    
+    </div>
 
     <!-- Main Canvas Area -->
     <div class="canvas-area">
@@ -338,7 +290,7 @@
             matTooltip="Toggle Grid"
             class="grid-btn"
           >
-            <mat-icon>grid_on</mat-icon>
+            <mat-icon>grid_{{ showGrid ? 'on' : 'off' }}</mat-icon>
           </button>
         </div>
 
@@ -392,7 +344,6 @@
         </div>
       </div>
     </div>
-</div>
 
     <!-- Right Sidebar - Actions -->
     <div class="sidebar sidebar-right">
@@ -455,9 +406,8 @@
         </div>
       </div>
     </div>
-
-
   </div>
+</div>
 
 <!-- Mobile floating action button -->
 <div class="fab-container" fxHide fxShow.xs>
