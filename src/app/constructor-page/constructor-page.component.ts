@@ -123,7 +123,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
       this.rowBeadsAmount
     );
   }
-  
+
   // ===== WEAVING PATTERN METHODS (using your service) =====
 
   onWeavingPatternChange(patternType: WeavingPatternType): void {
@@ -588,7 +588,7 @@ export class ConstructorPageComponent implements OnInit, OnDestroy {
 
     this.currentDesignId = null;
     this.constructorConfig.canvasArray =
-    this.constructorService.clearAllCanvas();
+      this.constructorService.clearAllCanvas();
     this.hasUnsavedChanges = false;
 
     // Reset to default weaving pattern

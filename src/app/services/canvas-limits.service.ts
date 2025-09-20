@@ -11,7 +11,7 @@ export class CanvasLimitsService {
     maxRows: 50,
     minColumns: 5,
     maxColumns: 200,
-    maxTotalCells: 5000, 
+    maxTotalCells: 5000,
   };
 
   private readonly PREMIUM_USER_LIMITS: CanvasLimits = {
@@ -19,7 +19,7 @@ export class CanvasLimitsService {
     maxRows: 100,
     minColumns: 5,
     maxColumns: 300,
-    maxTotalCells: 10000, 
+    maxTotalCells: 10000,
   };
 
   private readonly PERFORMANCE_LIMITS = {
@@ -139,7 +139,12 @@ export class CanvasLimitsService {
 
       // Браслети
       { rows: 7, columns: 100, label: 'Bracelet - Thin', product: 'bracelet' },
-      { rows: 9, columns: 100, label: 'Bracelet - Medium', product: 'bracelet' },
+      {
+        rows: 9,
+        columns: 100,
+        label: 'Bracelet - Medium',
+        product: 'bracelet',
+      },
       { rows: 11, columns: 100, label: 'Bracelet - Wide', product: 'bracelet' },
 
       // Чокери
